@@ -1,0 +1,35 @@
+{% load static %}
+<html>
+<head>
+  <link rel="stylesheet" href="{%static 'styles.css'%}">
+</head>
+<body>
+   <!-- <style>
+        body{
+            background-color: #706868; {%static 'styles.css'%}
+        } {% url 'login'}
+    </style>-->
+  <div align = "center">
+    <form method="post" action="{% url 'logins' %}">
+        {% csrf_token %}
+        <!--{{ form.as_p }}-->
+
+        <h2>{{ form.as_p }}  </h2>
+        <!--<h2> Password  {{form.}} </h2>-->
+        <button type="submit" value="submit" autofocus>Submit</button>
+    </form>
+  <!--  {% if UserForm.is_authenticated%}
+          Hello, {{  UserForm.username }} 
+    {% endif %} -->
+  </div>
+</body>
+</html>
+
+
+
+
+
+
+
+
+
