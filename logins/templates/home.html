@@ -21,7 +21,7 @@
       <button class="submit" align="center" value = "submit"> Sign in</button>
       {% if user.is_authenticated%}
           <h3>Hello, {{  user.username }} </h3>
-          <a href = {% url 'logout'%}>   signout </a>
+          <a href = {% url 'logout' %}>   signout </a>
       {% endif %}
     </form>  
     </div>
