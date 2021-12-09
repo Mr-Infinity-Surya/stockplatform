@@ -7,4 +7,5 @@ urlpatterns = [
     #path('',views.index,name='index'),
     #urls.url('',views.UserFormView.as_view(),name='logins'),
     urls.url('',views.home_view,name='logins'),
+    urls.url('logout',views.logoff,name='logout'),
 ]

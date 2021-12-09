@@ -1,6 +1,6 @@
-from django.contrib.auth import authenticate, login
-from django.shortcuts import render
-from django.http import HttpResponse, response
+from django.contrib.auth import authenticate, login, logout
+from django.shortcuts import redirect, render
+from django.http import HttpResponse, response,HttpResponseRedirect
 from django.views.generic import View
 from django.views import generic
 from .models import *
@@ -24,12 +24,20 @@ def home_view(request):
         #user.save()
         print(username)
         user = authenticate(request,password=password,username=username)
+        login(request,user) 
+        #logout(request)
         if user is not None:
-            return HttpResponse("<h1> Success</h1>")
+             return redirect('/')
         else:
-            return HttpResponse("<h1> Invalid Credentials </h1>")
+             return HttpResponse("<h1> Invalid Credentials </h1>")
     return render(request,template_name,context)
     
+def logoff(request):
+    print(request.POST)
+    template_name = 'home.html'
+    logout(request)
+    return render(request,template_name)
+
 # class UserFormView(View):
 #     form_class = UserForm
 #     template_name = 'home.html'

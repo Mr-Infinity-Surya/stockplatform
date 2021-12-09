@@ -13,16 +13,17 @@
     <p class="sign" align="center">Sign in</p>
     <form class="form1" method="post" action="{% url 'logins' %}">
       {% csrf_token %}
-      <!--<input class="un " type="text" align="center" placeholder="Username" id = "username">-->
-      <!--<input class="pass" type="password" align="center" placeholder="Password" id="password">-->
-      <div class = "un">
+      <input id = "username" name = "username" class="un " type="text" align="center" placeholder="Username">
+      <input class="pass" name = "password" type="password" align="center" placeholder="Password" id="password">
+      <!--<div class = "un">
       {{ form.as_p }}
-      </div>
+      </div>-->
       <button class="submit" align="center" value = "submit"> Sign in</button>
-    </form>
-                
+      {% if user.is_authenticated%}
+          <h3>Hello, {{  user.username }} </h3>
+          <a href = {% url 'logout'%}>   signout </a>
+      {% endif %}
+    </form>  
     </div>
-     
-</body>
-
+  </body>
 </html>
