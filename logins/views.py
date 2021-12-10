@@ -30,7 +30,7 @@ def user_login(request):
         #logout(request)
         if user is not None:
              login(request,user)
-             return HttpResponse("<h1> Success </h1>")
+             return render(request,'index.html')
         else:
              return HttpResponse("<h1> Invalid Credentials </h1>")
     return render(request,template_name,context)
@@ -65,7 +65,7 @@ def user_reg(request):
             user.last_name = form.cleaned_data['last_name']
             user.set_password(password)
             user.save()
-            return redirect('index')
+            return HttpResponse("<h1> Its correct <a href = 'register'> go back </a></h1>")
     else:
         form = UserForm()
         HttpResponse("Invalid <a href = 'register'> go back </a>")
