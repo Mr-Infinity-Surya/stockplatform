@@ -28,7 +28,7 @@ def user_login(request):
         #logout(request)
         if user is not None:
              login(request,user)
-             return redirect('index')
+             return HttpResponse("<h1> Success </h1>")
         else:
              return HttpResponse("<h1> Invalid Credentials </h1>")
     return render(request,template_name,context)
