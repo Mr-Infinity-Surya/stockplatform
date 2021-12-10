@@ -6,6 +6,7 @@ from django.views import generic
 from .models import *
 from .forms import UserForm
 from django.contrib import messages
+#from django.contrib.auth.models import User
 
 # Create your views here.
 def index(request):
@@ -55,12 +56,12 @@ def user_reg(request):
                 "password and confirm_password does not match"
             )
         else:
-            user = form.save(commit = False)
-            user.set_password(password)
-            user.save()
-            return redirect('logins')
+            form.save()
+            return HttpResponse("correct <a href = 'register'> go back </a>")
     else:
-        messages.error(request,"Bad Registration <a href = 'register'> go back </a>")
+        form = UserForm()
+        HttpResponse("Invalid <a href = 'register'> go back </a>")
+        #messages.error(request,"Bad Registration <a href = 'register'> go back </a>")
     return render(request,template_name,context)
 
 
