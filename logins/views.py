@@ -1,4 +1,4 @@
-from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth import authenticate, login, logout,password_validation
 from django.shortcuts import redirect, render
 from django.http import HttpResponse, response,HttpResponseRedirect
 from django.views.generic import View
@@ -7,8 +7,7 @@ from .models import *
 from .forms import UserForm
 from django.contrib import messages
 from django.contrib.auth.models import User
-#from django.contrib.auth.models import User
-
+from django.core.exceptions import ValidationError
 # Create your views here.
 def index(request):
     return render(request,'home.html')
@@ -37,7 +36,7 @@ def user_login(request):
     
 def user_logout(request):
     print(request.POST)
-    template_name = 'home.html'
+    template_name = 'index.html'
     logout(request)
     return render(request,template_name)
 
@@ -53,7 +52,7 @@ def user_reg(request):
         confirm_password = form.cleaned_data['confirm_password']
         email = form.cleaned_data['email']
         if (password != confirm_password):
-            raise form.ValidationError(
+            raise ValidationError(
                 "password and confirm_password does not match"
             )
         else:
@@ -61,6 +60,8 @@ def user_reg(request):
             # user.set_password(password)
             # user.save()
             user = User.objects.create_user(username,email,confirm_password)
+            if password_validation.validate_password(confirm_password,user) is not None:
+                raise ValidationError("The password is too similar to the username. This password is too short. It must contain at least 8 characters.")
             user.first_name = form.cleaned_data['first_name']
             user.last_name = form.cleaned_data['last_name']
             user.set_password(password)
