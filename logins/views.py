@@ -8,6 +8,7 @@ from .forms import UserForm
 from django.contrib import messages
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
+
 # Create your views here.
 def index(request):
     return render(request,'home.html')
@@ -37,40 +38,45 @@ def user_login(request):
 def user_logout(request):
     print(request.POST)
     template_name = 'index.html'
-    logout(request)
-    return render(request,template_name)
+    logout(request) 
+    return redirect('index:index')
+    #return render(request,template_name)
 
 def user_reg(request):
-    form = UserForm(request.POST)
-    template_name = 'signup.html'
-    context = {}
-    context['form'] = form
-    print(request.POST)
-    if form.is_valid():
-        username = form.cleaned_data['username']
-        password = form.cleaned_data['password']
-        confirm_password = form.cleaned_data['confirm_password']
-        email = form.cleaned_data['email']
-        if (password != confirm_password):
-            raise ValidationError(
-                "password and confirm_password does not match"
-            )
+    try:
+        form = UserForm(request.POST)
+        template_name = 'signup.html'
+        context = {}
+        context['form'] = form
+        print(request.POST)
+        if form.is_valid():
+            username = form.cleaned_data['username']
+            password = form.cleaned_data['password']
+            confirm_password = form.cleaned_data['confirm_password']
+            fn = form.cleaned_data['first_name']
+            email = form.cleaned_data['email']
+            if (password != confirm_password or User.objects.filter(email=email).exists() or User.objects.filter(password=password).exists() or User.objects.filter(fn=fn).exists()):
+                raise ValidationError(
+                    "password and confirm_password does not match"
+                )
+            else:
+                # user = form.save(commit=False)
+                # user.set_password(password)
+                # user.save()
+                user = User.objects.create_user(username,email,confirm_password)
+                if password_validation.validate_password(confirm_password,user) is not None:
+                    raise ValidationError("The password is too similar to the username. This password is too short. It must contain at least 8 characters.")
+                user.first_name = form.cleaned_data['first_name']
+                user.last_name = form.cleaned_data['last_name']
+                user.set_password(password)
+                user.save()
+                return redirect('index:index')
         else:
-            # user = form.save(commit=False)
-            # user.set_password(password)
-            # user.save()
-            user = User.objects.create_user(username,email,confirm_password)
-            if password_validation.validate_password(confirm_password,user) is not None:
-                raise ValidationError("The password is too similar to the username. This password is too short. It must contain at least 8 characters.")
-            user.first_name = form.cleaned_data['first_name']
-            user.last_name = form.cleaned_data['last_name']
-            user.set_password(password)
-            user.save()
-            return render(request,'index.html',context)
-    else:
-        form = UserForm()
-        HttpResponse("Invalid <a href = 'register'> go back </a>")
-        #messages.error(request,"Bad Registration <a href = 'register'> go back </a>")
+            form = UserForm()
+            HttpResponse("Invalid <a href = 'register'> go back </a>")
+            #messages.error(request,"Bad Registration <a href = 'register'> go back </a>")
+    except:
+        return HttpResponse("<h1>Invalid Credentials, Maybe Redundancy or error in fields <a href = 'register'> go back </a></h1>")
     return render(request,template_name,context)
 
 
