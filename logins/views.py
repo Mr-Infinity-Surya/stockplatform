@@ -8,6 +8,9 @@ from .forms import UserForm
 from django.contrib import messages
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
+from django.conf import settings
+from django.core.mail import send_mail
+import random,string
 
 # Create your views here.
 def index(request):
@@ -78,6 +81,29 @@ def user_reg(request):
     except:
         return HttpResponse("<h1>Invalid Credentials, Maybe Redundancy or error in fields <a href = 'register'> go back </a></h1>")
     return render(request,template_name,context)
+
+def user_reset(request):
+    form = UserForm(request.POST)
+    template_name = 'reset.html'
+    context = {}
+    context['form'] = form
+    print(request.POST)
+    x = ''.join(random.choices(string.ascii_letters + string.digits + '@',k=10))
+    if form.is_valid():
+        print("123")
+        email = form.cleaned_data['email']
+        if User.objects.filter(email=email).exists():
+            user = User.objects.get(email__exact=email)
+            print(user.first_name)
+            user.set_password(x)
+            user.save()
+            send_mail('New Password Reset',f'Hi {user.first_name} Ur new password is {x}',from_email=None,recipient_list=[email])
+            return HttpResponse("<h1> Done, check mail (if its in spam otherwise) n <a href='reset/login'> login </a></h1>")
+        else:
+            return HttpResponse('error')
+    return render(request,template_name,context)
+    
+
 
 
 

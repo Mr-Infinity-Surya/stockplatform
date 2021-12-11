@@ -1,0 +1,31 @@
+<html>
+{%load static%}
+<head>
+  <link rel="stylesheet" href="{%static 'styles.css'%}">
+  <link href="https://fonts.googleapis.com/css?family=Ubuntu" rel="stylesheet">
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet" href="{%static 'font-awesome.min.css'%}">
+  <title>Reset</title>
+</head>
+
+<body>
+  <div class="main">
+    <p class="sign" align="center">Resetting using Email</p>
+    <form class="form1" method="post" action="{% url 'reset' %}">
+      {% csrf_token %}
+      <input id = "username" name = "username" class="un " type="hidden" align="center" placeholder="Username" value="s">
+      <input class="pass" name = "password" type="hidden" align="center" placeholder="Password" id="password" value="asa">
+      <input id = "email" name = "email" class="un " type="text" align="center" placeholder="Enter registered Email-ID">
+      <!--<div class = "un">
+      {{ form.as_p }}
+      </div>-->
+      <button class="submit" align="center" value = "submit"> Submit</button>
+      {%if form.is_valid %}
+        <br>
+      {% else %}
+        <p> Invalid </p>
+        {%endif%}
+    </form>  
+    </div>
+  </body>
+</html>

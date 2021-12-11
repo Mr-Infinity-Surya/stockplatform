@@ -18,12 +18,13 @@
       <!--<div class = "un">
       {{ form.as_p }}
       </div>-->
-      <button class="submit" align="center" value = "submit"> Sign in</button>
+      <button class="submit" align="center" value = "submit"> Sign in</button> 
       {% if user.is_authenticated%}
           <h3>Hello, {{  user.username }} </h3>
           <a href = {% url 'logout' %}>   signout </a>
       {% endif %}
-    </form>  
+    </form>
+    <p align="center"> <a href = {%url 'reset'%}> <b> Forgot Password ? </b></a>  </p>
     </div>
   </body>
 </html>
