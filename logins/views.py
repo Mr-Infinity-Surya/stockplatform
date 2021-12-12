@@ -58,7 +58,8 @@ def user_reg(request):
             confirm_password = form.cleaned_data['confirm_password']
             fn = form.cleaned_data['first_name']
             email = form.cleaned_data['email']
-            if (password != confirm_password or User.objects.filter(email=email).exists() or User.objects.filter(password=password).exists() or User.objects.filter(fn=fn).exists()):
+            if (password != confirm_password or User.objects.filter(email=email).exists() or User.objects.filter(password=password).exists() or User.objects.filter(first_name=fn).exists()):
+                print(1)
                 raise ValidationError(
                     "password and confirm_password does not match"
                 )
@@ -68,6 +69,7 @@ def user_reg(request):
                 # user.save()
                 user = User.objects.create_user(username,email,confirm_password)
                 if password_validation.validate_password(confirm_password,user) is not None:
+                    print("123")
                     raise ValidationError("The password is too similar to the username. This password is too short. It must contain at least 8 characters.")
                 user.first_name = form.cleaned_data['first_name']
                 user.last_name = form.cleaned_data['last_name']
@@ -78,7 +80,8 @@ def user_reg(request):
             form = UserForm()
             HttpResponse("Invalid <a href = 'register'> go back </a>")
             #messages.error(request,"Bad Registration <a href = 'register'> go back </a>")
-    except:
+    except ValidationError:
+        print(Exception)
         return HttpResponse("<h1>Invalid Credentials, Maybe Redundancy or error in fields <a href = 'register'> go back </a></h1>")
     return render(request,template_name,context)
 
