@@ -14,8 +14,8 @@
     <form class="form1" method="post" action="{% url 'reset' %}">
       {% csrf_token %}
       <input id = "username" name = "username" class="un " type="hidden" align="center" placeholder="Username" value="s">
-      <input class="pass" name = "password" type="hidden" align="center" placeholder="Password" id="password" value="asa">
       <input id = "email" name = "email" class="un " type="text" align="center" placeholder="Enter registered Email-ID">
+      <input class="pass" name = "password" type="password" align="center" placeholder="Enter New Password" id="password">
       <!--<div class = "un">
       {{ form.as_p }}
       </div>-->

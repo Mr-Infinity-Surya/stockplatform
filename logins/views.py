@@ -91,17 +91,21 @@ def user_reset(request):
     context = {}
     context['form'] = form
     print(request.POST)
-    x = ''.join(random.choices(string.ascii_letters + string.digits + '@',k=10))
+    #x = ''.join(random.choices(string.ascii_letters + string.digits + '@',k=10))
     if form.is_valid():
         print("123")
         email = form.cleaned_data['email']
+        x = form.cleaned_data['password']
         if User.objects.filter(email=email).exists():
             user = User.objects.get(email__exact=email)
-            print(user.first_name)
-            user.set_password(x)
-            user.save()
-            send_mail('New Password Reset',f'Hi {user.first_name} Ur new password is {x}',from_email=None,recipient_list=[email])
-            return HttpResponse("<h1> Done, check mail (if its in spam otherwise) n <a href='reset/login'> login </a></h1>")
+            if password_validation.validate_password(x,user) is None:
+                print(user.first_name)
+                user.set_password(x)
+                user.save()
+                send_mail('New Password Reset',f'Hi {user.first_name} Ur new password is {x} and is successfully reseted',from_email=None,recipient_list=[email])
+                return HttpResponse("<h1> Done, check mail (if its in spam otherwise) n <a href='reset/login'> login </a></h1>")
+            else:
+                return HttpResponse('error')
         else:
             return HttpResponse('error')
     return render(request,template_name,context)
