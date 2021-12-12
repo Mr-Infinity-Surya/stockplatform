@@ -36,8 +36,13 @@
             <div class="bx content">
                 <div class="content-info">
                     <div>
-                        <img src="https://qph.fs.quoracdn.net/main-qimg-ef585690e769817c0828deeaabcd6b23-lq">
+                        {%if user.is_authenticated %}
+                        <a href="{%url 'databases:stocks'%}"><img src="https://qph.fs.quoracdn.net/main-qimg-ef585690e769817c0828deeaabcd6b23-lq"></a>
                         <p>Buy and sell</p>
+                        {%else%}
+                        <img src="https://qph.fs.quoracdn.net/main-qimg-ef585690e769817c0828deeaabcd6b23-lq"></a>
+                        <p>Buy and sell</p>
+                        {%endif%}
                     </div>
                     <div>
                         <img src="https://blog.tryshiftcdn.com/uploads/2021/01/notifications@2x.jpg">

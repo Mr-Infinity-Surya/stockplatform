@@ -9,6 +9,8 @@ class Invest(models.Model):
     id = models.IntegerField(primary_key=True)
     Stock_ISN = models.IntegerField()
 class Stock(models.Model) :
+    sector = models.CharField(max_length=100000)
+    longBusinessSummary = models.CharField(max_length=100000)
     stock_name = models.CharField(max_length=1000)
     ISIN = models.IntegerField(primary_key=True)
     volume = models.IntegerField()
