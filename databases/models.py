@@ -1,6 +1,5 @@
-from django import forms
-from django.core.validators import validate_email
 from django.db import models
+from django.core.validators import validate_email
 
 # Create your models here.
 class Stock(models.Model) :

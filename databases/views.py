@@ -7,7 +7,6 @@ from databases.models import Stock
 import plotly.graph_objs as go
 from django.contrib.auth.models import User
 
-
 # Create your views here.
 def index(request):
     return HttpResponse("OK")
