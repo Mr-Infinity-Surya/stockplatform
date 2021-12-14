@@ -5,6 +5,8 @@
     <head>
         <link rel="icon" href="images/shiba-logo.png">
         <link href="{%static 'index.css'%}" rel="stylesheet" type="text/css" media="all"/>
+        <link rel="stylesheet" href="{%static 'styles.css'%}">
+        <link rel="stylesheet" href="{%static 'font-awesome.min.css'%}">
         <title>StockEazy</title>
     </head>
     <body>
@@ -34,6 +36,14 @@
             </div>
 
             <div class="bx content">
+                {%if user.is_authenticated%}
+                    {%if check_investor is False%}
+                        <form class="form1" method="post" action = "logins/register_investor">
+                            {% csrf_token %}
+                            <button class="submit" align="center" value = "submit"> Complete Your Profile</button> 
+                        </form>
+                    {%endif%}
+                {%endif%}
                 <div class="content-info">
                     <div>
                         {%if user.is_authenticated %}

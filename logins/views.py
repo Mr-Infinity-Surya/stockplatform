@@ -11,6 +11,7 @@ from django.core.exceptions import ValidationError
 from django.conf import settings
 from django.core.mail import send_mail
 import random,string
+from databases.models import *
 
 # Create your views here.
 def index(request):
@@ -109,6 +110,9 @@ def user_reset(request):
         else:
             return HttpResponse('error')
     return render(request,template_name,context)
+
+def investor_reg(request):
+    return HttpResponse("ok")
     
 
 
