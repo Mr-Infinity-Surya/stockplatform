@@ -112,7 +112,33 @@ def user_reset(request):
     return render(request,template_name,context)
 
 def investor_reg(request):
-    return HttpResponse("ok")
+    if User.is_authenticated:
+        i = Investor(request.POST)
+        i.Username = request.user.username
+        i.Email_id = request.user.email
+        i.First_Name = request.user.first_name
+        i.Last_Name = request.user.last_name
+        i.Password = request.user.password
+        context = {}
+        context['investor'] = i
+        #return HttpResponse("ok")
+        print(request.POST)
+        print(str(i.Username))
+        req = request.POST.dict()
+        try:
+            i.clean()
+            for i in req.keys():
+                if (req[i] == ''):
+                    raise ValidationError("Problem")
+            i.save()
+            if Investor.objects.filter(Username=request.user.username).exists() is True:
+                return redirect('index:index')
+        except ValidationError:
+            print(ValidationError)
+            return HttpResponse("<h1> Error </h1>")
+        return render(request,'signup_invest.html',context)
+    else:
+        return HttpResponse("Error")
     
 
 
