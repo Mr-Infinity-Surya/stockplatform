@@ -38,7 +38,7 @@
             <div class="bx content">
                 {%if user.is_authenticated%}
                     {%if check_investor is False%}
-                        <form class="form1" method="post" action = "logins/register_investor">
+                        <form class="form1" method="get" action = "logins/register_investor">
                             {% csrf_token %}
                             <button class="submit" align="center" value = "submit"> Complete Your Profile</button> 
                         </form>
