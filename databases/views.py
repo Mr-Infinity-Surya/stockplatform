@@ -1,4 +1,5 @@
 from datetime import datetime
+import json
 from django.conf.urls import url
 from django.shortcuts import render
 from django.http import HttpResponse
@@ -7,6 +8,7 @@ import numpy as np
 from databases.models import Bank, Company, Investment, Stock
 import plotly.graph_objs as go
 from django.contrib.auth.models import User
+import redis
 
 # Create your views here.
 def index(request):
@@ -106,3 +108,28 @@ def fill_db2(request):
     else:
         return HttpResponse("<h1> Hello, ur not supposed to enter HERE !!!!! </h1>")
 
+
+def get_topnews(ticker_obj):
+    result = []
+    news_data = ticker_obj.news[:5]
+    for item in news_data:
+        result.append({key: item[key] for key in item.keys() & {'title','link'}})
+    return result
+
+def redis_data(request):
+    # Link : https://stackoverflow.com/questions/15219858/how-to-store-a-complex-object-in-redis-using-redis-py
+    if request.user.is_superuser:
+        r = redis.StrictRedis(host='localhost',port='6379',db=0)
+        stock_name = ['AAPL']
+        for i in stock_name:
+            data=yf.Ticker(i)
+            res = get_topnews(data)
+            print(res)
+            x = json.dumps(res)
+            r.set(i,x)
+            r.save()
+        res = json.loads(r.get(stock_name[0]))  #Retriving data from json
+        y = res[0]['title']
+        return HttpResponse(f'<h1> okk <br><br>{y} </h1>')
+    else:
+        return HttpResponse("<h1> Hello, ur not supposed to enter HERE !!!!! </h1>")
