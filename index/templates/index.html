@@ -40,12 +40,12 @@
                     {%if check_investor is False%}
                         <form class="form1" method="get" action = "logins/register_investor">
                             {% csrf_token %}
-                            <button class="submit" align="center" value = "submit"> Complete Your Profile</button> 
+                            <button class="submit" align="center" value = "submit" style="margin-left: 0px;font-size: 35px"> Complete Your Profile</button> 
                         </form>
                     {%else%}
                     <form class="form1" method="get" action = "dashboard">
                         {% csrf_token %}
-                        <button class="submit" align="center" value = "submit"> Go To Dashboard</button> 
+                        <button class="submit" align="center" value = "submit" style="margin-left: 0px;font-size: 35px"> Go To Dashboard</button> 
                     </form>
                     {%endif%}
                 {%endif%}
