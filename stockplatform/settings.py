@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'logins.apps.LoginsConfig',
     'databases.apps.DatabasesConfig',
     'index.apps.IndexConfig',
+    'dashboard.apps.DashboardConfig',
 ]
 
 MIDDLEWARE = [

@@ -42,6 +42,11 @@
                             {% csrf_token %}
                             <button class="submit" align="center" value = "submit"> Complete Your Profile</button> 
                         </form>
+                    {%else%}
+                    <form class="form1" method="get" action = "dashboard">
+                        {% csrf_token %}
+                        <button class="submit" align="center" value = "submit"> Go To Dashboard</button> 
+                    </form>
                     {%endif%}
                 {%endif%}
                 <div class="content-info">

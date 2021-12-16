@@ -23,4 +23,5 @@ urlpatterns = [
     #path('homepage/',include('homepage.urls')),
     path('',include('index.urls')),
     path('db/',include('databases.urls')),
+    path('dashboard/',include('dashboard.urls')),
 ]
