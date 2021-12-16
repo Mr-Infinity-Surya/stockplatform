@@ -12,7 +12,7 @@ def index(request):
         
         bankobj=Bank.objects.get(Username=name)
         accno=bankobj.Account_no
-        invested = Investment.objects.raw("SELECT id,Stock_ISIN_id FROM databases_Investment WHERE User_Account_no_id="+accno)
+        invested = Investment.objects.raw("SELECT id,Stock_ISIN_id FROM databases_investment WHERE User_Account_no_id='"+accno+"'")
         
         curr_invest=0
         curr =0 
