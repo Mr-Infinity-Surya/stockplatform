@@ -127,7 +127,7 @@
             <ul class="details">
               <li class="topic">Stock Name</li>
               {% for x in stokcs%}
-              <li><a href='#'>{{x.Name}}</a></li>
+              <li><a href="{% url 'databases:apidata'%}?name={{x.Name}}">{{x.Name}}</a></li>
                {% endfor %}
             </ul>
             <ul class="details">

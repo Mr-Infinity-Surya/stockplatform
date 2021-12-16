@@ -9,5 +9,5 @@ urlpatterns = [
     path('userstock',views.user_stock,name='userstock'),
     path('filldb',views.fill_db,name='filldb'),
     path('filldb2',views.fill_db2,name='filldb2'),
-    path('redisdata',views.redis_data,name='redisdata'),
+    path('apidata',views.redis_data,name='apidata'),
 ]
