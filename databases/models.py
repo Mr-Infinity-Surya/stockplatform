@@ -34,7 +34,7 @@ class Bank(models.Model):
     Username = models.ForeignKey(Investor,on_delete=models.CASCADE,default='empty')
     IFSC_code = models.CharField(max_length=1000)
     Branch = models.CharField(max_length=1000)
-    Current_amount = models.IntegerField()
+    Current_amount = models.IntegerField(default=0)
 
 class Company(models.Model):
     Name = models.CharField(primary_key=True,max_length=1000)
@@ -48,7 +48,7 @@ class Company(models.Model):
 class Investment(models.Model):
     Quantity = models.IntegerField()
     Date_of_Purchased = models.DateField()
-    Invested_Amt = models.FloatField()
+    #Invested_Amt = models.FloatField()
     Purchased_Value = models.FloatField()
     User_Account_no = models.ForeignKey(Bank,on_delete=models.CASCADE,default='empty')
     Stock_ISIN = models.ForeignKey(Stock,on_delete=models.CASCADE,default='0')

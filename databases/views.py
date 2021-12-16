@@ -120,14 +120,15 @@ def redis_data(request):
     # Link : https://stackoverflow.com/questions/15219858/how-to-store-a-complex-object-in-redis-using-redis-py
     if request.user.is_superuser:
         r = redis.StrictRedis(host='localhost',port='6379',db=0)
-        stock_name = ['AAPL']
+        stock_name =  ['AXISBANK.NS','BHARTIARTL.NS','CIPLA.NS','HCLTECH.NS','ICICIBANK.NS','ITC.NS','KOTAKBANK.NS','JSWSTEEL.NS','MARUTI.NS','POWERGRID.NS','SBIN.NS','TATAMOTORS.NS','TATASTEEL.NS','TCS.NS','WIPRO.NS','EICHERMOT.NS','GRASIM.NS', 'HINDUNILVR.NS', 'IOC.NS', 'LT.NS', 'NESTLEIND.NS', 'NTPC.NS','SUNPHARMA.NS', 'TECHM.NS', 'ULTRACEMCO.NS']
         for i in stock_name:
-            data=yf.Ticker(i)
-            res = get_topnews(data)
-            print(res)
-            x = json.dumps(res)
-            r.set(i,x)
-            r.save()
+            if r.get(i) is None:
+                data=yf.Ticker(i)
+                res = get_topnews(data)
+                print(res)
+                x = json.dumps(res)
+                r.set(i,x)
+                r.save()
         res = json.loads(r.get(stock_name[0]))  #Retriving data from json
         y = res[0]['title']
         return HttpResponse(f'<h1> okk <br><br>{y} </h1>')

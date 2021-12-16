@@ -12,4 +12,5 @@ urlpatterns = [
     path('reset',views.user_reset,name='reset'),
     path('reset/login',views.user_login,name='resetlogin'),
     path('register_investor',views.investor_reg,name='investor_registration'),
+    path('register_bank',views.bank_reg,name='register_bank'),
 ]

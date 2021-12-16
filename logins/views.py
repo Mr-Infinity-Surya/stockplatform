@@ -113,7 +113,9 @@ def user_reset(request):
 
 def investor_reg(request):
     if User.is_authenticated:
-        if request.method == 'POST':
+        if request.method == 'POST' and Investor.objects.filter(Username=request.user.username).exists() is True:
+            redirect('register_bank')
+        elif request.method == 'POST':
             i = Investor()
             i.Username = request.user.username
             i.Email_id = request.user.email
@@ -140,13 +142,45 @@ def investor_reg(request):
                         raise ValidationError("Problem")
                 i.save()
                 if Investor.objects.filter(Username=request.user.username).exists() is True:
-                    return redirect('index:index')
+                    return redirect('register_bank')
             except ValidationError:
                 print(ValidationError)
                 return HttpResponse("<h1> Error </h1>")
             return render(request,'signup_invest.html',context)
         else:
             return render(request,'signup_invest.html')
+    else:
+        return HttpResponse("Error")
+
+def bank_reg(request):
+    if User.is_authenticated and Investor.objects.filter(Username = request.user.username).exists() is True:
+        if request.method == 'POST':
+            i = Bank()
+            i.Username = Investor.objects.get(Username = request.user.username)
+            i.Account_no = request.POST['Account_no']
+            i.IFSC_code = request.POST['IFSC_code']
+            i.Branch = request.POST['Branch']
+            i.Current_amount = request.POST['Current_amount']
+            context = {}
+            context['investor'] = i
+            #return HttpResponse("ok")
+            print(request.POST)
+            print(str(i.Branch))
+            req = request.POST.dict()
+            try:
+                i.clean()
+                for itr in req.keys():
+                    if (req[itr] == ''):
+                        raise ValidationError("Problem")
+                i.save()
+                if Bank.objects.filter(Username=request.user.username).exists() is True:
+                    return redirect('index:index')
+            except ValidationError:
+                print(ValidationError)
+                return HttpResponse("<h1> Error </h1>")
+            return render(request,'signup_bank.html',context)
+        else:
+            return render(request,'signup_bank.html')
     else:
         return HttpResponse("Error")
     
