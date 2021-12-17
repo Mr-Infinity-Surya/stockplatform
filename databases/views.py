@@ -160,7 +160,9 @@ def redis_data(request):
 
 def buyupdate(request):
     if request.user.is_authenticated:
-        quantity = 10 # GET from page
+        if request.POST['Quantity'] == '':
+            return HttpResponse('<h1>Please Enter quantity</h1>')
+        quantity = int(request.POST['Quantity']) # GET from page
         stk_name = request.GET['name']#"TATAPOWER.NS" #GET FROM PAGE
         loguser = request.user.username
         bankobj=Bank.objects.get(Username=loguser)
@@ -174,29 +176,30 @@ def buyupdate(request):
                 #stk is purchased
                 if(bankobj.Current_amount < stk.Current_price*quantity):
                     purchased = 1
-                    invested.Quantity += quantity
-                    invested.Purchased_Value = stk.Current_price
-                    invested.Date_of_Purchased = datetime.datetime.today()
-                    invested.save()
-                    bankobj.Current_amount -= stk.Current_price*quantity
+                    invested2 = Investment.objects.get(Stock_ISIN=x.Stock_ISIN_id)
+                    invested2.Quantity += int(quantity)
+                    invested2.Purchased_Value = stk.Current_price
+                    invested2.Date_of_Purchased = datetime.today()
+                    invested2.save()
+                    bankobj.Current_amount -= int(stk.Current_price*int(quantity))
                     bankobj.save()
                     done = 1
                     
         if(purchased==0):
-            stk = Stock.objects.get(ISIN=x.Stock_ISIN_id)
+            stk = Stock.objects.get(Name=stk_name)
             investobj = Investment()
-            investobj['Quantity'] = quantity
-            investobj['Date_of_Purchased'] = datetime.datetime.today()
-            investobj['Purchased_Value'] = stk.Current_price
-            investobj['User_account_no'] = bankobj
-            investobj['Stock_ISIN'] = stk
+            investobj.Quantity = quantity
+            investobj.Date_of_Purchased = datetime.today()
+            investobj.Purchased_Value = stk.Current_price
+            investobj.User_Account_no = bankobj
+            investobj.Stock_ISIN = stk
             investobj.save()
-            bankobj.Current_amount -= stk.Current_price*quantity
+            bankobj.Current_amount -= int(stk.Current_price*int(quantity))
             bankobj.save()
             done = 1
         if(done==0) :
             return HttpResponse("<h1> Buy fail </h1>")
         else:
-            return redirect('dashboard')
+            return redirect('dashboard:index')
     else:
         return HttpResponse("<h1> Buy fail </h1>")

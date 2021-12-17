@@ -95,7 +95,7 @@ body {
     </ul>
 </ul>
 </div>
-<form class="sumit" method="post" action="{%url 'databases:buy_sell'%}?name={{name}}">
+<form method="post" action="{%url 'databases:buy_sell'%}?name={{name}}">
   {%csrf_token%}
   <button class="surya" type="submit" value="submit">BUY</button>
   <button class="sumanth" type="submit" value="submit">SELL</button>
