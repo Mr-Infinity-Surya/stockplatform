@@ -97,8 +97,8 @@ body {
 </div>
 <form method="post" action="{%url 'databases:buy_sell'%}?name={{name}}">
   {%csrf_token%}
-  <button class="surya" type="submit" value="submit">BUY</button>
-  <button class="sumanth" type="submit" value="submit">SELL</button>
+  <input class="surya" type="submit" value="BUY" name ="Buy">
+  <input class="sumanth" type="submit" value="SELL" name="Sell">
   <input class="sumit" type="text" id="Quantity" name = "Quantity" placeholder="Enter Quantity">
   </form>
     <iframe src="{%url 'databases:stocks'%}?name={{name}}" height="600px" width="100%" title="Stock Info"></iframe>

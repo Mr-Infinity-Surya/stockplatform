@@ -159,7 +159,9 @@ def redis_data(request):
 
 
 def buyupdate(request):
-    if request.user.is_authenticated:
+    print(request.POST)
+    if request.user.is_authenticated and 'Buy' in request.POST:
+        print(request.POST)
         if request.POST['Quantity'] == '':
             return HttpResponse('<h1>Please Enter quantity</h1>')
         quantity = int(request.POST['Quantity']) # GET from page
@@ -176,7 +178,7 @@ def buyupdate(request):
                 #stk is purchased
                 if(bankobj.Current_amount < stk.Current_price*quantity):
                     purchased = 1
-                    invested2 = Investment.objects.get(Stock_ISIN=x.Stock_ISIN_id)
+                    invested2 = Investment.objects.get(id=x.id)
                     invested2.Quantity += int(quantity)
                     invested2.Purchased_Value = stk.Current_price
                     invested2.Date_of_Purchased = datetime.today()
@@ -201,5 +203,46 @@ def buyupdate(request):
             return HttpResponse("<h1> Buy fail </h1>")
         else:
             return redirect('dashboard:index')
+    elif request.user.is_authenticated and 'Sell' in request.POST:
+        return sellupdate(request) #redirect('databases:sell')#
     else:
         return HttpResponse("<h1> Buy fail </h1>")
+
+def sellupdate(request):
+    if request.user.is_authenticated and 'Sell' in request.POST:
+        print(request.POST)
+        if request.POST['Quantity'] == '':
+            return HttpResponse('<h1>Please Enter quantity</h1>')
+        quantity = int(request.POST['Quantity']) # GET from page
+        stk_name = request.GET['name'] #"TATAPOWER.NS" #GET FROM PAGE
+        loguser = request.user.username
+        bankobj = Bank.objects.get(Username=loguser)
+        accno=bankobj.Account_no
+        invested = Investment.objects.raw("SELECT id,Stock_ISIN_id FROM databases_investment WHERE User_Account_no_id='"+accno+"'")
+        purchased = 0
+        done = 0
+        for x in invested : 
+            stk = Stock.objects.get(ISIN=x.Stock_ISIN_id)
+            if (stk.Name == stk_name) :
+                #stk is purchased
+                if(x.Quantity >= quantity):
+                    invested2 = Investment.objects.get(id=x.id)
+                    if invested2.Quantity == quantity:
+                        invested2.delete()
+                    else:
+                        invested2.Quantity -= quantity
+                        bankobj.Current_amount += quantity*float(stk.Current_price)
+                        invested2.save()
+                        bankobj.save()
+                    done = 1
+                    break
+                else : 
+                    return HttpResponse('<h1> Not enough quantity in your holdings </h1>')#say not enough quantity
+        if(done == 0) : 
+            return HttpResponse('<h1> you have not purchased stock </h1>') #say you have not purchased stock
+        else:
+            return redirect('dashboard:index')
+    elif request.user.is_authenticated and 'Buy' in request.POST:
+        return buyupdate(request) # redirect('databases:buy_sell')  #
+    else:
+        return HttpResponse("<h1> Sell fail </h1>")

@@ -11,4 +11,5 @@ urlpatterns = [
     path('filldb2',views.fill_db2,name='filldb2'),
     path('apidata',views.redis_data,name='apidata'),
     path('buy_sell',views.buyupdate,name='buy_sell'),
+    path('sell',views.sellupdate,name='sell'),
 ]

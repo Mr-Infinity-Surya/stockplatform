@@ -137,6 +137,8 @@ def investor_reg(request):
             req = request.POST.dict()
             try:
                 i.clean()
+                if Investor.objects.filter(Username = i.Username).exists():
+                    raise ValidationError("Problem")
                 for itr in req.keys():
                     if (req[itr] == ''):
                         raise ValidationError("Problem")
@@ -169,6 +171,8 @@ def bank_reg(request):
             req = request.POST.dict()
             try:
                 i.clean()
+                if Bank.objects.filter(Account_no = i.Account_no).exists():
+                    raise ValidationError("Problem")
                 for itr in req.keys():
                     if (req[itr] == ''):
                         raise ValidationError("Problem")
