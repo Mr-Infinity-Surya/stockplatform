@@ -10,8 +10,36 @@
 }
 
 body {
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: Arial, Helvetica, sans-serif; color:white;
+  background-color : #202121;
+  
 }
+
+.shrujan{
+  width : 300px;
+  border-width:300px;
+}
+
+.surya{
+  position: absolute;
+  top:50px;
+  left:1150px;
+  padding: 16px 32px;
+}
+
+.sumanth{
+  position: absolute;
+  top:120px;
+  left:1150px;
+  padding: 16px 32px;
+}
+
+.sumit{
+  position: absolute;
+  top:200px;
+  left:1080px;
+}
+
 
 /* Float four columns side by side */
 .column {
@@ -49,6 +77,7 @@ body {
 </style>
 </head>
 <body>
+  <div class="shrujan">
   <ul>
     <strong>{{name}} Stock Data</strong>
     <ul>
@@ -65,6 +94,13 @@ body {
     <li>Revenue Growth:{{stock.Revenue_growth}}</li>
     </ul>
 </ul>
+</div>
+<form class="sumit" method="post" action="{%url 'databases:buy_sell'%}?name={{name}}">
+  {%csrf_token%}
+  <button class="surya" type="submit" value="submit">BUY</button>
+  <button class="sumanth" type="submit" value="submit">SELL</button>
+  <input class="sumit" type="text" id="Quantity" name = "Quantity" placeholder="Enter Quantity">
+  </form>
     <iframe src="{%url 'databases:stocks'%}?name={{name}}" height="600px" width="100%" title="Stock Info"></iframe>
 <h2>Latest News Trends</h2>
 
