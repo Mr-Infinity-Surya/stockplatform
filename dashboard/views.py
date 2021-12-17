@@ -6,7 +6,7 @@ from databases.models import *
 # Create your views here.
 def index(request):
     if (request.user.is_authenticated):
-        stockobj = Stock.objects.raw("SELECT * FROM databases_stock ORDER BY beta DESC LIMIT 10")
+        stockobj = Stock.objects.raw("SELECT * FROM databases_stock ORDER BY beta DESC")
         name = request.user.username
         investordetails = Investor.objects.get(Username=name)
         
@@ -23,7 +23,9 @@ def index(request):
             prev+=x.Quantity*(Stock.objects.get(ISIN=x.Stock_ISIN_id).Prev_Close)
 
         pl =curr_invest-curr
-        plper = (pl/curr_invest)*100
+        plper=0
+        if(curr_invest!=0):
+            plper = (pl/curr_invest)*100
         userdata=Stock.objects.all()
 
         return render(request,'index_dash.html',{"investordetails":investordetails,userdata:":userdata" ,'stokcs':stockobj,"userinvested":invested,"dashvals":[int(curr_invest),int(curr),int(pl),round(plper,2),prev]})

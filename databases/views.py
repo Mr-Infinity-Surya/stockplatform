@@ -1,6 +1,6 @@
 from datetime import datetime
 import json
-from django.conf.urls import url
+
 from django.shortcuts import render
 from django.http import HttpResponse
 import yfinance as yf
@@ -138,10 +138,18 @@ def redis_data(request):
     elif request.user.is_authenticated:
         if request.method == 'GET':
             name = request.GET['name']
+            data=yf.Ticker(name)
+            res2 = json.dumps(get_topnews(data,5))
             res = json.loads(r.get(name))
+            if str(res2) != str(res):
+                r.set(name,res2)
+                r.save()
             context={}
             context['news'] = res
             context['name'] = name
+            stockobj = Stock.objects.get(Name=name)
+            print(stockobj)
+            context['stock'] = stockobj
             return render(request,'apinews.html',context)
         else:
             return HttpResponse("<h1> Hello, ur not supposed to enter HERE !!!!! </h1>")
