@@ -181,7 +181,7 @@ def bank_reg(request):
                     return redirect('index:index')
             except ValidationError:
                 print(ValidationError)
-                return HttpResponse("<h1> Error </h1>")
+                return HttpResponse("<h1> Error <a href = 'register_bank'> go back </a></h1>")
             return render(request,'signup_bank.html',context)
         else:
             return render(request,'signup_bank.html')

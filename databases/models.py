@@ -4,7 +4,7 @@ from django.core.validators import validate_email
 # Create your models here.
 class Stock(models.Model) :
     Name = models.CharField(max_length=1000)
-    ISIN = models.CharField(max_length=1000,primary_key=True)
+    ISIN = models.CharField(max_length=1000,primary_key=True,unique=True)
     Volume = models.IntegerField()
     Prev_Close = models.FloatField()
     Day_low =  models.FloatField()
@@ -30,14 +30,14 @@ class Investor(models.Model):
     Pin_code = models.IntegerField()
 
 class Bank(models.Model):
-    Account_no = models.CharField(primary_key=True,max_length=1000)
+    Account_no = models.CharField(primary_key=True,max_length=1000,unique=True)
     Username = models.ForeignKey(Investor,on_delete=models.CASCADE,default='empty')
     IFSC_code = models.CharField(max_length=1000)
     Branch = models.CharField(max_length=1000)
     Current_amount = models.IntegerField(default=0)
 
 class Company(models.Model):
-    Name = models.CharField(primary_key=True,max_length=1000)
+    Name = models.CharField(primary_key=True,max_length=1000,unique=True)
     Stock_ISIN = models.ForeignKey(Stock,on_delete=models.CASCADE,default='0')
     Sector = models.CharField(max_length=1000)
     Industry = models.CharField(max_length=10000,default='empty')
