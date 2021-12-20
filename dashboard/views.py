@@ -12,15 +12,18 @@ def index(request):
         
         bankobj=Bank.objects.get(Username=name)
         accno=bankobj.Account_no
-        invested = Investment.objects.raw("SELECT id,Stock_ISIN_id FROM databases_investment WHERE User_Account_no_id='"+accno+"'")
-        
+
+        invested = Investment.objects.raw("SELECT id,Stock_ISIN_id,SUM(Purchased_Value*Quantity) AS VALUE FROM databases_investment WHERE User_Account_no_id='"+accno+"'" + "GROUP BY Stock_ISIN_id")
         curr_invest=0
-        curr =0 
+        curr = 0 
         prev = 0
+        
+        #print(x.VALUE)
         for x in invested:
-            curr_invest+=x.Quantity*x.Purchased_Value
-            curr+=x.Quantity*(Stock.objects.get(ISIN=x.Stock_ISIN_id).Current_price)
-            prev+=x.Quantity*(Stock.objects.get(ISIN=x.Stock_ISIN_id).Prev_Close)
+            curr_invest+=x.VALUE
+            stock_value = Stock.objects.get(ISIN=x.Stock_ISIN_id)
+            curr+=x.Quantity*(stock_value.Current_price)
+            prev+=x.Quantity*(stock_value.Prev_Close)
 
         pl =curr_invest-curr
         plper=0
