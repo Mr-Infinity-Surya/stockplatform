@@ -103,7 +103,7 @@ def index(request):
                 name = 'Prediction'
             )
             layout = go.Layout(
-                title = name,
+                title = name + " Predicted Values",
                 xaxis = {'title' : "Date"},
                 yaxis = {'title' : "Close"}
             )
@@ -112,7 +112,7 @@ def index(request):
                 x=new_array,y= close_data
             )
             layoutfig2 = go.Layout(
-                title = name+"Predicted Values",
+                title = name,
                 xaxis = {'title' : "Date"},
                 yaxis = {'title' : "Close"}
             )

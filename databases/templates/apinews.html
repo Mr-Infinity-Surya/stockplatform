@@ -91,6 +91,19 @@ th, td {
   text-align: center;
   background-color: #f1f1f1;
 }
+
+/*Button*/
+.but {
+  background-color: white;
+  border: 2px solid black;
+  color: green;
+  padding: 5px 10px;
+  text-align: center;
+  display: inline-block;
+  font-size: 20px;
+  margin: 10px 30px;
+  cursor: pointer;
+}
 </style>
 </head>
 <body>
@@ -137,7 +150,7 @@ th, td {
   </div>
 </ul>
 </div>
-<h2 align = "center"> <a style="color: green;" href = "{%url 'prediction:index'%}?name={{name}}"> View Predictions </a></h2>
+<h2 align = "center"> <a style="color: #3ce61e;" href = "{%url 'prediction:index'%}?name={{name}}"> View Predictions </a></h2>
 <form method="post" action="{%url 'databases:buy_sell'%}?name={{name}}">
   {%csrf_token%}
   <input class="surya" type="submit" value="BUY" name ="Buy">
@@ -165,7 +178,8 @@ th, td {
     </div>
   </div>
     {%endfor%}
-
+</div> <br>
+    <a href="{% url 'dashboard:index'%}"> <button class = "but"> GO BACK </button> </a>
   {% comment %} <div class="column">
     <div class="card">
       <h3>Card 2</h3>
