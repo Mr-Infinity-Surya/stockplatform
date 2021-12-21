@@ -137,6 +137,7 @@ th, td {
   </div>
 </ul>
 </div>
+<h2 align = "center"> <a style="color: green;" href = "{%url 'prediction:index'%}?name={{name}}"> View Predictions </a></h2>
 <form method="post" action="{%url 'databases:buy_sell'%}?name={{name}}">
   {%csrf_token%}
   <input class="surya" type="submit" value="BUY" name ="Buy">

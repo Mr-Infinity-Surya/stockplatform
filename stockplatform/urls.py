@@ -24,4 +24,5 @@ urlpatterns = [
     path('',include('index.urls')),
     path('db/',include('databases.urls')),
     path('dashboard/',include('dashboard.urls')),
+    path('prediction/',include('prediction.urls')),
 ]
