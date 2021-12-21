@@ -12,8 +12,9 @@ def index(request):
         
         bankobj=Bank.objects.get(Username=name)
         accno=bankobj.Account_no
-
         invested = Investment.objects.raw("SELECT id,Stock_ISIN_id,SUM(Purchased_Value*Quantity) AS VALUE FROM databases_investment WHERE User_Account_no_id='"+accno+"'" + "GROUP BY Stock_ISIN_id")
+        investedtotal = Investment.objects.raw("SELECT id,Stock_ISIN_id FROM databases_investment WHERE User_Account_no_id='"+accno+"'" )
+
         curr_invest=0
         curr = 0 
         prev = 0
@@ -21,6 +22,7 @@ def index(request):
         #print(x.VALUE)
         for x in invested:
             curr_invest+=x.VALUE
+        for x in investedtotal:
             stock_value = Stock.objects.get(ISIN=x.Stock_ISIN_id)
             curr+=x.Quantity*(stock_value.Current_price)
             prev+=x.Quantity*(stock_value.Prev_Close)
@@ -31,6 +33,6 @@ def index(request):
             plper = (pl/curr_invest)*100
         userdata=Stock.objects.all()
 
-        return render(request,'index_dash.html',{"investordetails":investordetails,userdata:":userdata" ,'stokcs':stockobj,"userinvested":invested,"dashvals":[int(curr_invest),int(curr),int(pl),round(plper,2),prev]})
+        return render(request,'index_dash.html',{"curr":bankobj.Current_amount,"investordetails":investordetails,userdata:":userdata" ,'stokcs':stockobj,"userinvested":invested,"dashvals":[int(curr_invest),int(curr),int(pl),round(plper,2),prev]})
     else:   
         return HttpResponse('error',status=404)

@@ -1,16 +1,21 @@
-from datetime import datetime
+from datetime import date, datetime
 import json
+import re
 
 from django.shortcuts import redirect, render
 from django.http import HttpResponse
 import yfinance as yf
 import numpy as np
-from databases.models import Bank, Company, Investment, Stock
+from databases.models import Bank, Company, Investment, Stock, Investor
 import plotly.graph_objs as go
 from django.contrib.auth.models import User
 import redis
 
+ 
 # Create your views here.
+
+import pytz
+
 def index(request):
     return HttpResponse("OK")
 
@@ -57,16 +62,15 @@ def get_stock_data(stock_name):
 
 def fill_db(request):
     if request.user.is_superuser:
-        st = Stock()
-        stk_list = ['AXISBANK.NS','BHARTIARTL.NS','CIPLA.NS','HCLTECH.NS','ICICIBANK.NS','ITC.NS','KOTAKBANK.NS','JSWSTEEL.NS','MARUTI.NS','POWERGRID.NS','SBIN.NS','TATAMOTORS.NS','TATASTEEL.NS','TCS.NS','WIPRO.NS','EICHERMOT.NS','GRASIM.NS', 'HINDUNILVR.NS', 'IOC.NS', 'LT.NS', 'NESTLEIND.NS', 'NTPC.NS','SUNPHARMA.NS', 'TECHM.NS', 'ULTRACEMCO.NS']
-        for i in stk_list:
-            if Stock.objects.filter(Name = i).exists() is True:
-                return HttpResponse("Already updated")
-        for x in stk_list:
-            st = Stock() 
-            stk_res,cmp_res = get_stock_data(x)
-            st.Name = str(stk_res['Name'])
-            st.ISIN = str(stk_res['ISIN'])
+        #st = Stock()
+        #stk_list = ['AXISBANK.NS','BHARTIARTL.NS','CIPLA.NS','HCLTECH.NS','ICICIBANK.NS','ITC.NS','KOTAKBANK.NS','JSWSTEEL.NS','MARUTI.NS','POWERGRID.NS','SBIN.NS','TATAMOTORS.NS','TATASTEEL.NS','TCS.NS','WIPRO.NS','EICHERMOT.NS','GRASIM.NS', 'HINDUNILVR.NS', 'IOC.NS', 'LT.NS', 'NESTLEIND.NS', 'NTPC.NS','SUNPHARMA.NS', 'TECHM.NS', 'ULTRACEMCO.NS']
+        entries= Stock.objects.all()
+        
+
+        for st in entries:
+            
+            stk_res,cmp_re
+            
             st.Volume = int(stk_res['volume'])
             st.Prev_Close = float(stk_res['previousClose'])
             st.Day_low =  float(stk_res['dayLow'])
@@ -83,30 +87,93 @@ def fill_db(request):
     else:
         return HttpResponse("<h1> Hello, ur not supposed to enter HERE !!!!! </h1>")
 
+
+
 def fill_db2(request):
     if request.user.is_superuser:
-        co = Company()
-        stk_list = ['SBIN.NS','TATAMOTORS.NS','TATASTEEL.NS','TCS.NS','WIPRO.NS','EICHERMOT.NS','GRASIM.NS', 'HINDUNILVR.NS', 'IOC.NS', 'LT.NS', 'NESTLEIND.NS', 'NTPC.NS','SUNPHARMA.NS', 'TECHM.NS', 'ULTRACEMCO.NS']   #'AXISBANK.NS','BHARTIARTL.NS','CIPLA.NS','HCLTECH.NS','ICICIBANK.NS','ITC.NS','KOTAKBANK.NS','JSWSTEEL.NS','MARUTI.NS','POWERGRID.NS'
-        for i in stk_list:
-            if Company.objects.filter(Name = i).exists() is True:
-                return HttpResponse("Already updated")
+        stk_list = ['AXISBANK.NS','BHARTIARTL.NS','CIPLA.NS','HCLTECH.NS','ICICIBANK.NS','ITC.NS','KOTAKBANK.NS','JSWSTEEL.NS','MARUTI.NS','POWERGRID.NS','SBIN.NS','TATAMOTORS.NS','TATASTEEL.NS','TCS.NS','WIPRO.NS','EICHERMOT.NS','GRASIM.NS', 'HINDUNILVR.NS', 'IOC.NS', 'LT.NS', 'NESTLEIND.NS', 'NTPC.NS','SUNPHARMA.NS', 'TECHM.NS', 'ULTRACEMCO.NS']
         for x in stk_list:
-            co = Company() 
             stk_res,cmp_res = get_stock_data(x)
+            if (Stock.objects.filter(ISIN = str(stk_res['ISIN'])).exists() is False):
+                st = Stock.objects.get(ISIN = str(stk_res['ISIN']))
+                co = Company.objects.get(Stock_ISIN=str(cmp_res['ISIN']))
+            else:
+                st = Stock() 
+                co = Company()
+            st.Name = str(stk_res['Name'])
+            st.ISIN = str(stk_res['ISIN'])
+            st.Volume = int(stk_res['volume'])
+            st.Prev_Close = float(stk_res['previousClose'])
+            st.Day_low =  float(stk_res['dayLow'])
+            st.Current_price =  float(stk_res['currentPrice'])
+            st.Beta =  float(stk_res['beta'])
+            st.Regular_market_open =  float(stk_res['regularMarketOpen'])
+            st.Day_high =  float(stk_res['dayHigh'])
+            st.Open =  float(stk_res['open'])
+            st.Revenue_growth =  float(stk_res['revenueGrowth'])
+
+            st.clean()
+            st.save()
+            
             co.Name = str(cmp_res['longName'])
-            co.Stock_ISIN = Stock.objects.get(ISIN = str(cmp_res['ISIN']))
+            co.Stock_ISIN = Stock.objects.get(ISIN=str(cmp_res['ISIN']))
             co.Sector = str(cmp_res['sector'])    
             co.Industry = str(cmp_res['industry'])
             co.Business_Summary =str(cmp_res['longBusinessSummary'])
             co.Website = cmp_res['website']
             co.Gross_Profit = float(cmp_res['grossProfits'])
-            print(co)
+
+            print(st,co)
             co.clean()
             co.save()
         x = Stock.objects.all()
         return HttpResponse("ok<br>{{x}}")
     else:
         return HttpResponse("<h1> Hello, ur not supposed to enter HERE !!!!! </h1>")
+
+
+
+# def fill_db2(request):
+#     if request.user.is_superuser:
+        
+#         co_entries = Company.objects.all()
+#         co_entries.delete()
+#         stk_entries = Company.objects.all()
+#         stk_entries.delete()
+#         stk_list = ['AXISBANK.NS','BHARTIARTL.NS','CIPLA.NS','HCLTECH.NS','ICICIBANK.NS','ITC.NS','KOTAKBANK.NS','JSWSTEEL.NS','MARUTI.NS','POWERGRID.NS','SBIN.NS','TATAMOTORS.NS','TATASTEEL.NS','TCS.NS','WIPRO.NS','EICHERMOT.NS','GRASIM.NS', 'HINDUNILVR.NS', 'IOC.NS', 'LT.NS', 'NESTLEIND.NS', 'NTPC.NS','SUNPHARMA.NS', 'TECHM.NS', 'ULTRACEMCO.NS']
+        
+#         for x in stk_list:
+#             co = Company() 
+#             stk_res,cmp_res = get_stock_data(x)
+#             co.Name = str(cmp_res['longName'])
+#             co.Stock_ISIN = Stock.objects.get(ISIN=(cmp_res['ISIN']))
+#             co.Sector = str(cmp_res['sector'])    
+#             co.Industry = str(cmp_res['industry'])
+#             co.Business_Summary =str(cmp_res['longBusinessSummary'])
+#             co.Website = cmp_res['website']
+#             co.Gross_Profit = float(cmp_res['grossProfits'])
+
+#             st = Stock() 
+#             st.Name = str(stk_res['Name'])
+#             st.ISIN = str(stk_res['ISIN'])
+#             st.Volume = int(stk_res['volume'])
+#             st.Prev_Close = float(stk_res['previousClose'])
+#             st.Day_low =  float(stk_res['dayLow'])
+#             st.Current_price =  float(stk_res['currentPrice'])
+#             st.Beta =  float(stk_res['beta'])
+#             st.Regular_market_open =  float(stk_res['regularMarketOpen'])
+#             st.Day_high =  float(stk_res['dayHigh'])
+#             st.Open =  float(stk_res['open'])
+#             st.Revenue_growth =  float(stk_res['revenueGrowth'])
+#             print(st,co)
+#             st.clean()
+#             st.save()
+#             co.clean()
+#             co.save()
+#         x = Stock.objects.all()
+#         return HttpResponse("ok<br>{{x}}")
+#     else:
+#         return HttpResponse("<h1> Hello, ur not supposed to enter HERE !!!!! </h1>")
 
 
 def get_topnews(ticker_obj,p):
@@ -138,7 +205,7 @@ def redis_data(request):
     elif request.user.is_authenticated:
         if request.method == 'GET':
             name = request.GET['name']
-            data=yf.Ticker(name)
+            data=yf.Ticker(name)     
             res2 = json.dumps(get_topnews(data,5))
             res = json.loads(r.get(name))
             if str(res2) != str(res):
@@ -148,8 +215,26 @@ def redis_data(request):
             context['news'] = res
             context['name'] = name
             stockobj = Stock.objects.get(Name=name)
-            print(stockobj)
+            #print(stockobj)
             context['stock'] = stockobj
+            uname = request.user.username
+            bankobj=Bank.objects.get(Username=uname)
+            accno=bankobj.Account_no
+            bought = Investment.objects.raw("SELECT * from databases_investment WHERE User_Account_no_id='"+accno+"' AND Stock_ISIN_id = '"+str(stockobj.ISIN)+"'")
+           
+            
+            bought_stk = Investment.objects.raw("SELECT id,SUM(Quantity) as totalstk,SUM(Quantity*Purchased_value) AS usersum,SUM(Quantity*Current_price) as stksum from databases_investment LEFT JOIN databases_stock ON databases_investment.Stock_ISIN_id=databases_stock.ISIN WHERE databases_stock.ISIN='"+str(stockobj.ISIN)+"' AND  User_Account_no_id='"+accno+"'")
+            context['invests'] = {}
+            
+            for x in bought_stk:
+                context['invests']['totalstk'] = x.totalstk
+                context['invests']['usersum'] = x.usersum
+                context['invests']['stksum'] = x.stksum
+            context['bought']=bought
+            cmpy = Company.objects.get(Stock_ISIN=stockobj)
+            context['cmpy'] = cmpy
+            
+           # context['cmpy']['Gross_Profit'] =  numerize.numerize(context['cmpy']['Gross_Profit'] )
             return render(request,'apinews.html',context)
         else:
             return HttpResponse("<h1> Hello, ur not supposed to enter HERE !!!!! </h1>")
@@ -169,36 +254,54 @@ def buyupdate(request):
         loguser = request.user.username
         bankobj=Bank.objects.get(Username=loguser)
         accno=bankobj.Account_no
-        invested = Investment.objects.raw("SELECT id,Stock_ISIN_id FROM databases_investment WHERE User_Account_no_id='"+accno+"'")
-        purchased = 0
+        stk = Stock.objects.get(Name=stk_name)
+        # curr_amount = accno.Current_amount
+        # invested = Investment.objects.raw("SELECT id,Stock_ISIN_id FROM databases_investment WHERE User_Account_no_id='"+accno+"'")
+        # purchased = 0
         done = 0
-        for x in invested : 
-            stk = Stock.objects.get(ISIN=x.Stock_ISIN_id)
-            if (stk.Name == stk_name) :
-                #stk is purchased
-                if(bankobj.Current_amount < stk.Current_price*quantity):
-                    purchased = 1
-                    invested2 = Investment.objects.get(id=x.id)
-                    invested2.Quantity += int(quantity)
-                    invested2.Purchased_Value = stk.Current_price
-                    invested2.Date_of_Purchased = datetime.today()
-                    invested2.save()
-                    bankobj.Current_amount -= int(stk.Current_price*int(quantity))
-                    bankobj.save()
-                    done = 1
+        vals = {"curr" : bankobj.Current_amount 
+        }
+        # bought = Investment.objects.raw("SELECT * from databases_investment WHERE User_Account_no_id='"+accno+"' AND Stock_ISIN_id = '"+str(stockobj.ISIN)+"'")
+        if(bankobj.Current_amount < stk.Current_price*quantity):return HttpResponse("<h1> Buy fail, You dont have Enough Amount in your account  </h1>")
+        # for x in invested : 
+        #     stk = Stock.objects.get(ISIN=x.Stock_ISIN_id)
+        #     if (stk.Name == stk_name) :
+        #         #stk is purchased
+        #        
+        
+        #             purchased = 1
+        #             invested2 = Investment.objects.get(id=x.id)
+        #             invested2.Quantity += int(quantity)
+        #             invested2.Purchased_Value = stk.Current_price
+        #             invested2.Date_of_Purchased = datetime.today()
+        #             invested2.save()
+        #             bankobj.Current_amount -= int(stk.Current_price*int(quantity))
+        #             bankobj.save()
+        #             done = 1
                     
-        if(purchased==0):
-            stk = Stock.objects.get(Name=stk_name)
-            investobj = Investment()
-            investobj.Quantity = quantity
-            investobj.Date_of_Purchased = datetime.today()
-            investobj.Purchased_Value = stk.Current_price
-            investobj.User_Account_no = bankobj
-            investobj.Stock_ISIN = stk
-            investobj.save()
-            bankobj.Current_amount -= int(stk.Current_price*int(quantity))
-            bankobj.save()
-            done = 1
+        # if(purchased==0):
+        #     stk = Stock.objects.get(Name=stk_name)
+        #     investobj = Investment()
+        #     investobj.Quantity = quantity
+        #     investobj.Date_of_Purchased = datetime.today()
+        #     investobj.Purchased_Value = stk.Current_price
+        #     investobj.User_Account_no = bankobj
+        #     investobj.Stock_ISIN = stk
+        #     investobj.save()
+        #     bankobj.Current_amount -= int(stk.Current_price*int(quantity))
+        #     bankobj.save()
+       
+        stk = Stock.objects.get(Name=stk_name)
+        investobj = Investment()
+        investobj.Quantity = quantity
+        investobj.Date_of_Purchased = datetime.today()
+        investobj.Purchased_Value = stk.Current_price
+        investobj.User_Account_no = bankobj
+        investobj.Stock_ISIN = stk
+        investobj.save()
+        bankobj.Current_amount -= int(stk.Current_price*int(quantity))
+        bankobj.save()
+        done = 1
         if(done==0) :
             return HttpResponse("<h1> Buy fail </h1>")
         else:
@@ -225,6 +328,7 @@ def sellupdate(request):
             stk = Stock.objects.get(ISIN=x.Stock_ISIN_id)
             if (stk.Name == stk_name) :
                 #stk is purchased
+                print(x.Quantity)
                 if(x.Quantity >= quantity):
                     invested2 = Investment.objects.get(id=x.id)
                     if invested2.Quantity == quantity:

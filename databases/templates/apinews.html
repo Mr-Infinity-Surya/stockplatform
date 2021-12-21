@@ -16,30 +16,47 @@ body {
 }
 
 .shrujan{
-  width : 300px;
+  width : 700px;
   border-width:300px;
 }
 
 .surya{
   position: absolute;
-  top:50px;
+  top:120px;
   left:1150px;
   padding: 16px 32px;
+  border : 12px;
+  background-color: green;
+  color: white;
+  font-size: 16px;
 }
 
 .sumanth{
   position: absolute;
-  top:120px;
+  top:200px;
   left:1150px;
+  border : 12px;
   padding: 16px 32px;
+  color: white;
+  background-color: #4CAF50;
+  font-size: 16px;    
 }
 
 .sumit{
   position: absolute;
-  top:200px;
-  left:1080px;
+  top:280px;
+  left:1120px;
+  
 }
 
+table, th, td {
+  border: 1px solid white;
+  border-collapse: collapse;
+}
+th, td {
+  background-color: #1b1c1e;
+  padding : 10px;
+}
 
 /* Float four columns side by side */
 .column {
@@ -79,20 +96,45 @@ body {
 <body>
   <div class="shrujan">
   <ul>
-    <strong>{{name}} Stock Data</strong>
+    <h1><strong>{{name}}  {{stock.ISIN}}</h1> </strong>
+    {%if invests.usersum != None%}
+    <h2> <br> Invested Sum :  {{invests.usersum}} <br> Total Quantity :{{invests.totalstk}} <br> Current Value :{{invests.stksum}} </h2>  
+    
+    <table>
+      
+      <tr>
+        <th>Date of Purchase  </th>
+        <th>Quantity  </th>
+        <th>Value</th>
+      </tr>
+      {%for x in bought%}
+      <tr>
+        <td>{{x.Date_of_Purchased}}</td>
+        <td>{{x.Quantity}}</td>
+        <td> {{x.Purchased_Value}}</td>
+      </tr>
+      {%endfor%}
+      
+    </table> 
+   {%else%}
+   <h4><strong>No investments for this Stock</h4> </strong>
+      {%endif%}
+      <div class = "addinfo">
     <ul>
-    <li>Name:{{stock.Name}}</li>
-    <li>ISIN:{{stock.ISIN}}</li>
-    <li>Volume:{{stock.Volume}}</li>
-    <li>Previous Close:{{stock.Prev_Close}}</li>
-    <li>Day low:{{stock.Day_low}}</li>
-    <li>Current Price:{{stock.Current_price}}</li>
-    <li>Beta:{{stock.Beta}}</li>
-    <li>Regular market open:{{stock.Regular_market_open}}</li>
-    <li>Day High:{{stock.Day_high}}</li>
-    <li>Stock open:{{stock.Open}}</li>
-    <li>Revenue Growth:{{stock.Revenue_growth}}</li>
+      <strong><h3><li>Current Price : {{stock.Current_price}}</li></h3></strong>
+   
+    <li>Stock open : {{stock.Open}}</li>
+    <li>Previous Close : {{stock.Prev_Close}}</li>
+    <li>Day low : {{stock.Day_low}}</li>
+    <li>Day High : {{stock.Day_high}}</li>
+    <li>Beta : {{stock.Beta}}</li>
+
+    <li>Volume : {{stock.Volume}}</li>
+    <li>Regular market open : {{stock.Regular_market_open}}</li>
+    <li>Revenue Growth : {{stock.Revenue_growth}}</li>
+   
     </ul>
+  </div>
 </ul>
 </div>
 <form method="post" action="{%url 'databases:buy_sell'%}?name={{name}}">
@@ -102,6 +144,14 @@ body {
   <input class="sumit" type="text" id="Quantity" name = "Quantity" placeholder="Enter Quantity">
   </form>
     <iframe src="{%url 'databases:stocks'%}?name={{name}}" height="600px" width="100%" title="Stock Info"></iframe>
+ <br>  <h2> Company Details : </h2>
+  <ul>
+    <li>Sector : {{cmpy.Sector}}</li>
+    <li>Industry : {{cmpy.Industry}}</li>
+    <li>Website : <a href = {{cmpy.Website}}>{{cmpy.Website}}</a></li>
+    <li>Gross Profit : {{cmpy.Gross_Profit}} Rupees</li>
+    <li>Business Summary : {{cmpy.Business_Summary}}</li>
+    <ul>
 <h2>Latest News Trends</h2>
 
 <div class="row">
