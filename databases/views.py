@@ -65,25 +65,7 @@ def fill_db(request):
         #st = Stock()
         #stk_list = ['AXISBANK.NS','BHARTIARTL.NS','CIPLA.NS','HCLTECH.NS','ICICIBANK.NS','ITC.NS','KOTAKBANK.NS','JSWSTEEL.NS','MARUTI.NS','POWERGRID.NS','SBIN.NS','TATAMOTORS.NS','TATASTEEL.NS','TCS.NS','WIPRO.NS','EICHERMOT.NS','GRASIM.NS', 'HINDUNILVR.NS', 'IOC.NS', 'LT.NS', 'NESTLEIND.NS', 'NTPC.NS','SUNPHARMA.NS', 'TECHM.NS', 'ULTRACEMCO.NS']
         entries= Stock.objects.all()
-        
-
-        for st in entries:
-            
-            stk_res,cmp_re
-            
-            st.Volume = int(stk_res['volume'])
-            st.Prev_Close = float(stk_res['previousClose'])
-            st.Day_low =  float(stk_res['dayLow'])
-            st.Current_price =  float(stk_res['currentPrice'])
-            st.Beta =  float(stk_res['beta'])
-            st.Regular_market_open =  float(stk_res['regularMarketOpen'])
-            st.Day_high =  float(stk_res['dayHigh'])
-            st.Open =  float(stk_res['open'])
-            st.Revenue_growth =  float(stk_res['revenueGrowth'])
-            print(st)
-            st.clean()
-            st.save()
-        return HttpResponse("ok<br>{{Stock.objects.all}}")
+        return HttpResponse(f"ok<br>{{Stock.objects.all}}")
     else:
         return HttpResponse("<h1> Hello, ur not supposed to enter HERE !!!!! </h1>")
 
