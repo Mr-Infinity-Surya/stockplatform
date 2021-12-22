@@ -1,7 +1,7 @@
 from datetime import date, datetime
 import json
 import re
-
+from django.db.models import Sum
 from django.shortcuts import redirect, render
 from django.http import HttpResponse
 import yfinance as yf
@@ -293,6 +293,7 @@ def buyupdate(request):
     else:
         return HttpResponse("<h1> Buy fail </h1>")
 
+
 def sellupdate(request):
     if request.user.is_authenticated and 'Sell' in request.POST:
         print(request.POST)
@@ -304,27 +305,33 @@ def sellupdate(request):
         bankobj = Bank.objects.get(Username=loguser)
         accno=bankobj.Account_no
         invested = Investment.objects.raw("SELECT id,Stock_ISIN_id FROM databases_investment WHERE User_Account_no_id='"+accno+"'")
-        purchased = 0
-        done = 0
-        for x in invested : 
-            stk = Stock.objects.get(ISIN=x.Stock_ISIN_id)
-            if (stk.Name == stk_name) :
-                #stk is purchased
-                print(x.Quantity)
-                if(x.Quantity >= quantity):
-                    invested2 = Investment.objects.get(id=x.id)
-                    if invested2.Quantity == quantity:
-                        invested2.delete()
-                    else:
-                        invested2.Quantity -= quantity
-                        bankobj.Current_amount += quantity*float(stk.Current_price)
-                        invested2.save()
-                        bankobj.save()
-                    done = 1
-                    break
-                else : 
-                    return HttpResponse('<h1> Not enough quantity in your holdings </h1>')#say not enough quantity
-        if(done == 0) : 
+        stk = Stock.objects.get(Name = stk_name)
+        bought = Investment.objects.raw("SELECT * from databases_investment WHERE User_Account_no_id='"+accno+"' AND Stock_ISIN_id = '"+str(stk.ISIN)+"'")
+        total = Investment.objects.filter(Stock_ISIN= stk.ISIN).aggregate(Sum('Quantity'))
+        total = total['Quantity__sum']
+
+        print(total)
+        if( quantity is None or total is None) : return HttpResponse('<h1> Not enough quantity in your holdings </h1>')
+        if( quantity > total) : return HttpResponse('<h1> Not enough quantity in your holdings </h1>')
+        total = quantity
+        stkcurr = stk.Current_price
+        for x in bought : 
+            if(total ==0) : break
+            if(x.Quantity < total) :
+                total-=x.Quantity
+                bankobj.Current_amount += stkcurr * x.Quantity
+                x.delete()
+            else :
+                x.Quantity-=total
+                bankobj.Current_amount += stkcurr * total
+                total = 0
+                if(x.Quantity == 0) : x.delete()
+                else : x.save()
+            bankobj.save()
+                
+            
+
+        if(bought is None) : 
             return HttpResponse('<h1> you have not purchased stock </h1>') #say you have not purchased stock
         else:
             return redirect('dashboard:index')
@@ -332,3 +339,45 @@ def sellupdate(request):
         return buyupdate(request) # redirect('databases:buy_sell')  #
     else:
         return HttpResponse("<h1> Sell fail </h1>")
+
+
+
+# def sellupdate(request):
+#     if request.user.is_authenticated and 'Sell' in request.POST:
+#         print(request.POST)
+#         if request.POST['Quantity'] == '':
+#             return HttpResponse('<h1>Please Enter quantity</h1>')
+#         quantity = int(request.POST['Quantity']) # GET from page
+#         stk_name = request.GET['name'] #"TATAPOWER.NS" #GET FROM PAGE
+#         loguser = request.user.username
+#         bankobj = Bank.objects.get(Username=loguser)
+#         accno=bankobj.Account_no
+#         invested = Investment.objects.raw("SELECT id,Stock_ISIN_id FROM databases_investment WHERE User_Account_no_id='"+accno+"'")
+#         purchased = 0
+#         done = 0
+#         for x in invested : 
+#             stk = Stock.objects.get(ISIN=x.Stock_ISIN_id)
+#             if (stk.Name == stk_name) :
+#                 #stk is purchased
+#                 print(x.Quantity)
+#                 if(x.Quantity >= quantity):
+#                     invested2 = Investment.objects.get(id=x.id)
+#                     if invested2.Quantity == quantity:
+#                         invested2.delete()
+#                     else:
+#                         invested2.Quantity -= quantity
+#                         bankobj.Current_amount += quantity*float(stk.Current_price)
+#                         invested2.save()
+#                         bankobj.save()
+#                     done = 1
+#                     break
+#                 else : 
+#                     return HttpResponse('<h1> Not enough quantity in your holdings </h1>')#say not enough quantity
+#         if(done == 0) : 
+#             return HttpResponse('<h1> you have not purchased stock </h1>') #say you have not purchased stock
+#         else:
+#             return redirect('dashboard:index')
+#     elif request.user.is_authenticated and 'Buy' in request.POST:
+#         return buyupdate(request) # redirect('databases:buy_sell')  #
+#     else:
+#         return HttpResponse("<h1> Sell fail </h1>")

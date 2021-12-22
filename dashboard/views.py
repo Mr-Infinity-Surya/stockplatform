@@ -15,6 +15,10 @@ def index(request):
         invested = Investment.objects.raw("SELECT id,Stock_ISIN_id,SUM(Purchased_Value*Quantity) AS VALUE FROM databases_investment WHERE User_Account_no_id='"+accno+"'" + "GROUP BY Stock_ISIN_id")
         investedtotal = Investment.objects.raw("SELECT id,Stock_ISIN_id FROM databases_investment WHERE User_Account_no_id='"+accno+"'" )
 
+        recommned = Stock.objects.raw("Select ISIN,Name from databases_stock ORDER BY ((Current_price-prev_close)*100/Current_price) DESC LIMIT 5")
+        for x in recommned:
+            print(x.Name)
+        
         curr_invest=0
         curr = 0 
         prev = 0
@@ -28,11 +32,12 @@ def index(request):
             prev+=x.Quantity*(stock_value.Prev_Close)
 
         pl =curr_invest-curr
+        pl*=-1
         plper=0
         if(curr_invest!=0):
             plper = (pl/curr_invest)*100
         userdata=Stock.objects.all()
 
-        return render(request,'index_dash.html',{"curr":bankobj.Current_amount,"investordetails":investordetails,userdata:":userdata" ,'stokcs':stockobj,"userinvested":invested,"dashvals":[int(curr_invest),int(curr),int(pl),round(plper,2),prev]})
+        return render(request,'index_dash.html',{"recommned":recommned,"curr":bankobj.Current_amount,"investordetails":investordetails,userdata:":userdata" ,'stokcs':stockobj,"userinvested":invested,"dashvals":[int(curr_invest),int(curr),int(pl),round(plper,2),prev]})
     else:   
         return HttpResponse('error',status=404)

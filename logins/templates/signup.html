@@ -9,7 +9,7 @@
 </head>
 
 <body>
-  <div class="main">
+  <div class="main" style = "height: 725px;">
     <p class="sign" align="center">SignUp for StockEazy</p>
     <form class="form1" method="post" action="/logins/register">
       {% csrf_token %}
@@ -23,6 +23,7 @@
       <!--<div class = "un">
       {{ form.as_p }}
       </div>-->
+      <h5 class = "un"> Note : Password should be more than 8 characters, with a mix of letters,numbers and special characters </h5>
       <button class="submit" align="center" value = "submit"> Submit</button>
       <!--{% if user.is_authenticated%}
           <h3>Hello, {{  user.username }} </h3>
