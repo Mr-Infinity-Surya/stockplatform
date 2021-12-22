@@ -70,7 +70,6 @@ def fill_db(request):
         return HttpResponse("<h1> Hello, ur not supposed to enter HERE !!!!! </h1>")
 
 
-
 def fill_db2(request):
     if request.user.is_superuser:
         stk_list = ['AXISBANK.NS','BHARTIARTL.NS','CIPLA.NS','HCLTECH.NS','ICICIBANK.NS','ITC.NS','KOTAKBANK.NS','JSWSTEEL.NS','MARUTI.NS','POWERGRID.NS','SBIN.NS','TATAMOTORS.NS','TATASTEEL.NS','TCS.NS','WIPRO.NS','EICHERMOT.NS','GRASIM.NS', 'HINDUNILVR.NS', 'IOC.NS', 'LT.NS', 'NESTLEIND.NS', 'NTPC.NS','SUNPHARMA.NS', 'TECHM.NS', 'ULTRACEMCO.NS']
@@ -112,50 +111,6 @@ def fill_db2(request):
         return HttpResponse("ok<br>{{x}}")
     else:
         return HttpResponse("<h1> Hello, ur not supposed to enter HERE !!!!! </h1>")
-
-
-
-# def fill_db2(request):
-#     if request.user.is_superuser:
-        
-#         co_entries = Company.objects.all()
-#         co_entries.delete()
-#         stk_entries = Company.objects.all()
-#         stk_entries.delete()
-#         stk_list = ['AXISBANK.NS','BHARTIARTL.NS','CIPLA.NS','HCLTECH.NS','ICICIBANK.NS','ITC.NS','KOTAKBANK.NS','JSWSTEEL.NS','MARUTI.NS','POWERGRID.NS','SBIN.NS','TATAMOTORS.NS','TATASTEEL.NS','TCS.NS','WIPRO.NS','EICHERMOT.NS','GRASIM.NS', 'HINDUNILVR.NS', 'IOC.NS', 'LT.NS', 'NESTLEIND.NS', 'NTPC.NS','SUNPHARMA.NS', 'TECHM.NS', 'ULTRACEMCO.NS']
-        
-#         for x in stk_list:
-#             co = Company() 
-#             stk_res,cmp_res = get_stock_data(x)
-#             co.Name = str(cmp_res['longName'])
-#             co.Stock_ISIN = Stock.objects.get(ISIN=(cmp_res['ISIN']))
-#             co.Sector = str(cmp_res['sector'])    
-#             co.Industry = str(cmp_res['industry'])
-#             co.Business_Summary =str(cmp_res['longBusinessSummary'])
-#             co.Website = cmp_res['website']
-#             co.Gross_Profit = float(cmp_res['grossProfits'])
-
-#             st = Stock() 
-#             st.Name = str(stk_res['Name'])
-#             st.ISIN = str(stk_res['ISIN'])
-#             st.Volume = int(stk_res['volume'])
-#             st.Prev_Close = float(stk_res['previousClose'])
-#             st.Day_low =  float(stk_res['dayLow'])
-#             st.Current_price =  float(stk_res['currentPrice'])
-#             st.Beta =  float(stk_res['beta'])
-#             st.Regular_market_open =  float(stk_res['regularMarketOpen'])
-#             st.Day_high =  float(stk_res['dayHigh'])
-#             st.Open =  float(stk_res['open'])
-#             st.Revenue_growth =  float(stk_res['revenueGrowth'])
-#             print(st,co)
-#             st.clean()
-#             st.save()
-#             co.clean()
-#             co.save()
-#         x = Stock.objects.all()
-#         return HttpResponse("ok<br>{{x}}")
-#     else:
-#         return HttpResponse("<h1> Hello, ur not supposed to enter HERE !!!!! </h1>")
 
 
 def get_topnews(ticker_obj,p):
@@ -245,34 +200,6 @@ def buyupdate(request):
         }
         # bought = Investment.objects.raw("SELECT * from databases_investment WHERE User_Account_no_id='"+accno+"' AND Stock_ISIN_id = '"+str(stockobj.ISIN)+"'")
         if(bankobj.Current_amount < stk.Current_price*quantity):return HttpResponse("<h1> Buy fail, You dont have Enough Amount in your account  </h1>")
-        # for x in invested : 
-        #     stk = Stock.objects.get(ISIN=x.Stock_ISIN_id)
-        #     if (stk.Name == stk_name) :
-        #         #stk is purchased
-        #        
-        
-        #             purchased = 1
-        #             invested2 = Investment.objects.get(id=x.id)
-        #             invested2.Quantity += int(quantity)
-        #             invested2.Purchased_Value = stk.Current_price
-        #             invested2.Date_of_Purchased = datetime.today()
-        #             invested2.save()
-        #             bankobj.Current_amount -= int(stk.Current_price*int(quantity))
-        #             bankobj.save()
-        #             done = 1
-                    
-        # if(purchased==0):
-        #     stk = Stock.objects.get(Name=stk_name)
-        #     investobj = Investment()
-        #     investobj.Quantity = quantity
-        #     investobj.Date_of_Purchased = datetime.today()
-        #     investobj.Purchased_Value = stk.Current_price
-        #     investobj.User_Account_no = bankobj
-        #     investobj.Stock_ISIN = stk
-        #     investobj.save()
-        #     bankobj.Current_amount -= int(stk.Current_price*int(quantity))
-        #     bankobj.save()
-       
         stk = Stock.objects.get(Name=stk_name)
         investobj = Investment()
         investobj.Quantity = quantity
@@ -341,43 +268,3 @@ def sellupdate(request):
         return HttpResponse("<h1> Sell fail </h1>")
 
 
-
-# def sellupdate(request):
-#     if request.user.is_authenticated and 'Sell' in request.POST:
-#         print(request.POST)
-#         if request.POST['Quantity'] == '':
-#             return HttpResponse('<h1>Please Enter quantity</h1>')
-#         quantity = int(request.POST['Quantity']) # GET from page
-#         stk_name = request.GET['name'] #"TATAPOWER.NS" #GET FROM PAGE
-#         loguser = request.user.username
-#         bankobj = Bank.objects.get(Username=loguser)
-#         accno=bankobj.Account_no
-#         invested = Investment.objects.raw("SELECT id,Stock_ISIN_id FROM databases_investment WHERE User_Account_no_id='"+accno+"'")
-#         purchased = 0
-#         done = 0
-#         for x in invested : 
-#             stk = Stock.objects.get(ISIN=x.Stock_ISIN_id)
-#             if (stk.Name == stk_name) :
-#                 #stk is purchased
-#                 print(x.Quantity)
-#                 if(x.Quantity >= quantity):
-#                     invested2 = Investment.objects.get(id=x.id)
-#                     if invested2.Quantity == quantity:
-#                         invested2.delete()
-#                     else:
-#                         invested2.Quantity -= quantity
-#                         bankobj.Current_amount += quantity*float(stk.Current_price)
-#                         invested2.save()
-#                         bankobj.save()
-#                     done = 1
-#                     break
-#                 else : 
-#                     return HttpResponse('<h1> Not enough quantity in your holdings </h1>')#say not enough quantity
-#         if(done == 0) : 
-#             return HttpResponse('<h1> you have not purchased stock </h1>') #say you have not purchased stock
-#         else:
-#             return redirect('dashboard:index')
-#     elif request.user.is_authenticated and 'Buy' in request.POST:
-#         return buyupdate(request) # redirect('databases:buy_sell')  #
-#     else:
-#         return HttpResponse("<h1> Sell fail </h1>")
