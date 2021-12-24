@@ -185,7 +185,7 @@ def buyupdate(request):
     if request.user.is_authenticated and 'Buy' in request.POST:
         print(request.POST)
         if request.POST['Quantity'] == '':
-            return HttpResponse('<h1>Please Enter quantity</h1>')
+            return HttpResponse('<h1>Please Enter quantity <a href = \'/dashboard\'> go back </a></h1>')
         quantity = int(request.POST['Quantity']) # GET from page
         stk_name = request.GET['name']#"TATAPOWER.NS" #GET FROM PAGE
         loguser = request.user.username
@@ -199,7 +199,7 @@ def buyupdate(request):
         vals = {"curr" : bankobj.Current_amount 
         }
         # bought = Investment.objects.raw("SELECT * from databases_investment WHERE User_Account_no_id='"+accno+"' AND Stock_ISIN_id = '"+str(stockobj.ISIN)+"'")
-        if(bankobj.Current_amount < stk.Current_price*quantity):return HttpResponse("<h1> Buy fail, You dont have Enough Amount in your account  </h1>")
+        if(bankobj.Current_amount < stk.Current_price*quantity):return HttpResponse("<h1> Buy fail, You dont have Enough Amount in your account <a href = \'/dashboard\'> go back </a> </h1>")
         stk = Stock.objects.get(Name=stk_name)
         investobj = Investment()
         investobj.Quantity = quantity
@@ -218,14 +218,14 @@ def buyupdate(request):
     elif request.user.is_authenticated and 'Sell' in request.POST:
         return sellupdate(request) #redirect('databases:sell')#
     else:
-        return HttpResponse("<h1> Buy fail </h1>")
+        return HttpResponse("<h1> Buy fail <a href = \'/dashboard\'> go back </a></h1>")
 
 
 def sellupdate(request):
     if request.user.is_authenticated and 'Sell' in request.POST:
         print(request.POST)
         if request.POST['Quantity'] == '':
-            return HttpResponse('<h1>Please Enter quantity</h1>')
+            return HttpResponse('<h1>Please Enter quantity <a href = \'/dashboard\'> go back </a> </h1>')
         quantity = int(request.POST['Quantity']) # GET from page
         stk_name = request.GET['name'] #"TATAPOWER.NS" #GET FROM PAGE
         loguser = request.user.username
@@ -238,8 +238,8 @@ def sellupdate(request):
         total = total['Quantity__sum']
 
         print(total)
-        if( quantity is None or total is None) : return HttpResponse('<h1> Not enough quantity in your holdings </h1>')
-        if( quantity > total) : return HttpResponse('<h1> Not enough quantity in your holdings </h1>')
+        if( quantity is None or total is None) : return HttpResponse('<h1> Not enough quantity in your holdings <a href = \'/dashboard\'> go back </a></h1>')
+        if( quantity > total) : return HttpResponse('<h1> Not enough quantity in your holdings <a href = \'/dashboard\'> go back </a></h1>')
         total = quantity
         stkcurr = stk.Current_price
         for x in bought : 
@@ -259,12 +259,12 @@ def sellupdate(request):
             
 
         if(bought is None) : 
-            return HttpResponse('<h1> you have not purchased stock </h1>') #say you have not purchased stock
+            return HttpResponse('<h1> you have not purchased stock <a href = \'databases:apidata\'> go back </a></h1>') #say you have not purchased stock
         else:
             return redirect('dashboard:index')
     elif request.user.is_authenticated and 'Buy' in request.POST:
         return buyupdate(request) # redirect('databases:buy_sell')  #
     else:
-        return HttpResponse("<h1> Sell fail </h1>")
+        return HttpResponse("<h1> Sell fail <a href = \'/dashboard\'> go back </a></h1>")
 
 
