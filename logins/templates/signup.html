@@ -11,7 +11,7 @@
 <body>
   <div class="main" style = "height: 725px;">
     <p class="sign" align="center">SignUp for StockEazy</p>
-    <form class="form1" method="post" action="/logins/register">
+    <form class="form1" method="post" action="/logins/register" style="padding-top: 40px;">
       {% csrf_token %}
       <input id = "username" name = "username" class="un " type="text" align="center" placeholder="Username">
       <input class="pass" name = "password" type="password" align="center" placeholder="Password" id="password">
