@@ -34,15 +34,18 @@ def user_login(request):
         #logout(request)
         if user is not None:
              login(request,user)
+             messages.success(request,"Logged in Successfully !!")
              return redirect('index:index')
         else:
-             return HttpResponse("<h1> Invalid Credentials </h1>")
+             #return HttpResponse("<h1> Invalid Credentials </h1>")
+             messages.error(request,"Invalid Credentials !!")
     return render(request,template_name,context)
     
 def user_logout(request):
     print(request.POST)
     template_name = 'index.html'
-    logout(request) 
+    logout(request)
+    messages.success(request,"You are Logged Out") 
     return redirect('index:index')
     #return render(request,template_name)
 
@@ -76,14 +79,17 @@ def user_reg(request):
                 user.last_name = form.cleaned_data['last_name']
                 user.set_password(password)
                 user.save()
+                messages.success(request,"Successfully Registered")
                 return redirect('index:index')
         else:
-            form = UserForm()
-            HttpResponse("Invalid <a href = 'register'> go back </a>")
-            #messages.error(request,"Bad Registration <a href = 'register'> go back </a>")
+            #form = UserForm()
+            #return HttpResponse("Invalid <a href = 'register'> go back </a>")
+            messages.info(request,"Please Fill the Details Properly")
     except ValidationError:
         print(Exception)
-        return HttpResponse("<h1>Invalid Credentials, Maybe Redundancy or error in fields <a href = 'register'> go back </a></h1>")
+        messages.error(request,"Invalid Credentials, Maybe Redundancy or error in fields")
+        form = UserForm()
+        #return HttpResponse("<h1>Invalid Credentials, Maybe Redundancy or error in fields <a href = 'register'> go back </a></h1>")
     return render(request,template_name,context)
 
 def user_reset(request):
@@ -104,11 +110,16 @@ def user_reset(request):
                 user.set_password(x)
                 user.save()
                 send_mail('New Password Reset',f'Hi {user.first_name} Your new password is {x} and is successfully reseted. Note that this will be your password unless resetted again. If you want to change the password to your convenience, contact this email.',from_email=None,recipient_list=[email])
-                return HttpResponse("<h1> Done, check mail (if its in spam otherwise) n <a href='reset/login'> login </a></h1>")
+                messages.success(request,"Succesfully Sent, check mail (if its in spam otherwise) n <a href='reset/login'> login </a></h1>")
+                #return HttpResponse("<h1> Done, check mail (if its in spam otherwise) n <a href='reset/login'> login </a></h1>")
             else:
-                return HttpResponse('error')
+                messages.error(request,"Error User not Found")
+                #return HttpResponse('error')
         else:
-            return HttpResponse('error')
+            #return HttpResponse('error')
+            messages.error(request,"error")
+    else:
+        messages.info(request,"Please Fill the Details Properly")
     return render(request,template_name,context)
 
 def investor_reg(request):
@@ -147,7 +158,9 @@ def investor_reg(request):
                     return redirect('register_bank')
             except ValidationError:
                 print(ValidationError)
-                return HttpResponse("<h1> Error </h1>")
+                i = Investor()
+                messages.error(request,"Error")
+                #return HttpResponse("<h1> Error </h1>")
             return render(request,'signup_invest.html',context)
         else:
             return render(request,'signup_invest.html')
@@ -178,10 +191,13 @@ def bank_reg(request):
                         raise ValidationError("Problem")
                 i.save()
                 if Bank.objects.filter(Username=request.user.username).exists() is True:
+                    messages.success(request,"Your all set to go...")
                     return redirect('index:index')
             except ValidationError:
                 print(ValidationError)
-                return HttpResponse("<h1> Error <a href = 'register_bank'> go back </a></h1>")
+                messages.error("Error !!")
+                i = Bank()
+                #return HttpResponse("<h1> Error <a href = 'register_bank'> go back </a></h1>")
             return render(request,'signup_bank.html',context)
         else:
             return render(request,'signup_bank.html')
@@ -189,34 +205,6 @@ def bank_reg(request):
         return HttpResponse("Error")
     
 
-
-
-
-# class UserFormView(View):
-#     form_class = UserForm
-#     template_name = 'home.html'
-
-#     def get(self,request):
-#         form = self.form_class(None)
-#         return render(request,self.template_name,{'form' : form})
-
-#     def post(self,request):
-#         form = self.form_class(request.POST)
-
-#         if form.is_valid():
-
-#             #user = form.save(commit=False)
-            
-#             username = form.cleaned_data['username']
-#             password = form.cleaned_data['password']
-#             #user.set_password(password)
-#             #user.save()
-
-#             user = authenticate(username=username,password=password)
-
-#             if user is not None:
-#                 HttpResponse("Success")
-#         return render(request,self.template_name,{'form':form})
 
 
 

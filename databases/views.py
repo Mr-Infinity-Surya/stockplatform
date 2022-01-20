@@ -1,5 +1,6 @@
 from datetime import date, datetime
 import json
+from django.contrib import messages
 import re
 from django.db.models import Sum
 from django.shortcuts import redirect, render
@@ -185,7 +186,9 @@ def buyupdate(request):
     if request.user.is_authenticated and 'Buy' in request.POST:
         print(request.POST)
         if request.POST['Quantity'] == '':
-            return HttpResponse('<h1>Please Enter quantity <a href = \'/dashboard\'> go back </a></h1>')
+            messages.error(request,"Please Enter quantity")
+            return redirect('/db/apidata'+'?name='+request.GET['name'])
+            #return HttpResponse('<h1>Please Enter quantity <a href = \'/dashboard\'> go back </a></h1>')
         quantity = int(request.POST['Quantity']) # GET from page
         stk_name = request.GET['name']#"TATAPOWER.NS" #GET FROM PAGE
         loguser = request.user.username
@@ -199,7 +202,10 @@ def buyupdate(request):
         vals = {"curr" : bankobj.Current_amount 
         }
         # bought = Investment.objects.raw("SELECT * from databases_investment WHERE User_Account_no_id='"+accno+"' AND Stock_ISIN_id = '"+str(stockobj.ISIN)+"'")
-        if(bankobj.Current_amount < stk.Current_price*quantity):return HttpResponse("<h1> Buy fail, You dont have Enough Amount in your account <a href = \'/dashboard\'> go back </a> </h1>")
+        if(bankobj.Current_amount < stk.Current_price*quantity):
+            messages.error(request,"Buy fail, You dont have Enough Amount in your account")
+            return redirect('/db/apidata'+'?name='+request.GET['name'])
+            #return HttpResponse("<h1> Buy fail, You dont have Enough Amount in your account <a href = \'/dashboard\'> go back </a> </h1>")
         stk = Stock.objects.get(Name=stk_name)
         investobj = Investment()
         investobj.Quantity = quantity
@@ -212,8 +218,11 @@ def buyupdate(request):
         bankobj.save()
         done = 1
         if(done==0) :
-            return HttpResponse("<h1> Buy fail </h1>")
+            messages.error(request,"Buy fail")
+            return redirect('/db/apidata'+'?name='+request.GET['name'])
+            #return HttpResponse("<h1> Buy fail </h1>")
         else:
+            messages.success(request,f'Hurray !!! Stock {stk_name} Brought @ Rs. {int(stk.Current_price*int(quantity))}')
             return redirect('dashboard:index')
     elif request.user.is_authenticated and 'Sell' in request.POST:
         return sellupdate(request) #redirect('databases:sell')#
@@ -225,7 +234,9 @@ def sellupdate(request):
     if request.user.is_authenticated and 'Sell' in request.POST:
         print(request.POST)
         if request.POST['Quantity'] == '':
-            return HttpResponse('<h1>Please Enter quantity <a href = \'/dashboard\'> go back </a> </h1>')
+            messages.error(request,"Please Enter quantity")
+            return redirect('/db/apidata'+'?name='+request.GET['name'])
+            #return HttpResponse('<h1>Please Enter quantity <a href = \'/dashboard\'> go back </a> </h1>')
         quantity = int(request.POST['Quantity']) # GET from page
         stk_name = request.GET['name'] #"TATAPOWER.NS" #GET FROM PAGE
         loguser = request.user.username
@@ -238,8 +249,14 @@ def sellupdate(request):
         total = total['Quantity__sum']
 
         print(total)
-        if( quantity is None or total is None) : return HttpResponse('<h1> Not enough quantity in your holdings <a href = \'/dashboard\'> go back </a></h1>')
-        if( quantity > total) : return HttpResponse('<h1> Not enough quantity in your holdings <a href = \'/dashboard\'> go back </a></h1>')
+        if( quantity is None or total is None) : 
+            messages.error(request,"Error !! Not enough quantity in your holdings")
+            return redirect('/db/apidata'+'?name='+request.GET['name'])
+            #return HttpResponse('<h1> Not enough quantity in your holdings <a href = \'/dashboard\'> go back </a></h1>')
+        if( quantity > total) : 
+            messages.error(request,"Error !! Not enough quantity in your holdings")
+            return redirect('/db/apidata'+'?name='+request.GET['name'])
+            #return HttpResponse('<h1> Not enough quantity in your holdings <a href = \'/dashboard\'> go back </a></h1>')
         total = quantity
         stkcurr = stk.Current_price
         for x in bought : 
@@ -258,9 +275,12 @@ def sellupdate(request):
                 
             
 
-        if(bought is None) : 
+        if(bought is None) :
+            messages.error(request,"Error !! you have not purchased stock")
+            return redirect('/db/apidata'+'?name='+request.GET['name'])
             return HttpResponse('<h1> you have not purchased stock <a href = \'databases:apidata\'> go back </a></h1>') #say you have not purchased stock
         else:
+            messages.success(request,f"U sold {stk_name} @ Rs. {stkcurr} for {quantity} no.s")
             return redirect('dashboard:index')
     elif request.user.is_authenticated and 'Buy' in request.POST:
         return buyupdate(request) # redirect('databases:buy_sell')  #
