@@ -77,11 +77,11 @@ def fill_db2(request):
         for x in stk_list:
             stk_res,cmp_res = get_stock_data(x)
             if (Stock.objects.filter(ISIN = str(stk_res['ISIN'])).exists() is False):
-                st = Stock.objects.get(ISIN = str(stk_res['ISIN']))
-                co = Company.objects.get(Stock_ISIN=str(cmp_res['ISIN']))
-            else:
                 st = Stock() 
                 co = Company()
+            else:
+                st = Stock.objects.get(ISIN = str(stk_res['ISIN']))
+                co = Company.objects.get(Stock_ISIN=str(cmp_res['ISIN']))
             st.Name = str(stk_res['Name'])
             st.ISIN = str(stk_res['ISIN'])
             st.Volume = int(stk_res['volume'])
@@ -123,32 +123,32 @@ def get_topnews(ticker_obj,p):
 
 def redis_data(request):
     # Link : https://stackoverflow.com/questions/15219858/how-to-store-a-complex-object-in-redis-using-redis-py
-    r = redis.StrictRedis(host='localhost',port='6379',db=0)
-    if request.user.is_superuser:
-        if (request.GET['num'] == ''):
-            return HttpResponse("<h1> Hello, ur not supposed to enter HERE !!!!! </h1>")
-        p = int(request.GET['num'])
-        stock_name =  ['AXISBANK.NS','BHARTIARTL.NS','CIPLA.NS','HCLTECH.NS','ICICIBANK.NS','ITC.NS','KOTAKBANK.NS','JSWSTEEL.NS','MARUTI.NS','POWERGRID.NS','SBIN.NS','TATAMOTORS.NS','TATASTEEL.NS','TCS.NS','WIPRO.NS','EICHERMOT.NS','GRASIM.NS', 'HINDUNILVR.NS', 'IOC.NS', 'LT.NS', 'NESTLEIND.NS', 'NTPC.NS','SUNPHARMA.NS', 'TECHM.NS', 'ULTRACEMCO.NS']
-        for i in stock_name:
-            if r.get(i) is None or p != 0:
-                data=yf.Ticker(i)
-                res = get_topnews(data,p)
-                print(res)
-                x = json.dumps(res)
-                r.set(i,x)
-                r.save()
-        res = json.loads(r.get(stock_name[0]))  #Retriving data from json
-        y = res[0]['title']
-        return HttpResponse(f'<h1> okk <br><br>{y} </h1>')
-    elif request.user.is_authenticated:
+    r = redis.StrictRedis(host='localhost',port='6379',db=0,password='Stock@123')
+    # if request.user.is_superuser:
+    #     if (request.GET['num'] == ''):
+    #         return HttpResponse("<h1> Hello, ur not supposed to enter HERE !!!!! </h1>")
+    #     p = int(request.GET['num'])
+    #     stock_name =  ['AXISBANK.NS','BHARTIARTL.NS','CIPLA.NS','HCLTECH.NS','ICICIBANK.NS','ITC.NS','KOTAKBANK.NS','JSWSTEEL.NS','MARUTI.NS','POWERGRID.NS','SBIN.NS','TATAMOTORS.NS','TATASTEEL.NS','TCS.NS','WIPRO.NS','EICHERMOT.NS','GRASIM.NS', 'HINDUNILVR.NS', 'IOC.NS', 'LT.NS', 'NESTLEIND.NS', 'NTPC.NS','SUNPHARMA.NS', 'TECHM.NS', 'ULTRACEMCO.NS']
+    #     for i in stock_name:
+    #         if r.get(i) is None or p != 0:
+    #             data=yf.Ticker(i)
+    #             res = get_topnews(data,p)
+    #             print(res)
+    #             x = json.dumps(res)
+    #             r.set(i,x)
+    #             r.save()
+    #     res = json.loads(r.get(stock_name[0]))  #Retriving data from json
+    #     y = res[0]['title']
+    #     return HttpResponse(f'<h1> okk <br><br>{y} </h1>')
+    if request.user.is_authenticated:
         if request.method == 'GET':
             name = request.GET['name']
             data=yf.Ticker(name)     
-            res2 = json.dumps(get_topnews(data,5))
+            #res2 = json.dumps(get_topnews(data,5))
             res = json.loads(r.get(name))
-            if str(res2) != str(res):
-                r.set(name,res2)
-                r.save()
+            # if str(res2) != str(res):
+            #     r.set(name,res2)
+            #     r.save()
             context={}
             context['news'] = res
             context['name'] = name
