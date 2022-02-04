@@ -71,8 +71,10 @@ def fill_db2():
         co.clean()
         co.save()
 
-schedule.every(1).minutes.do(fill_db2)
+# schedule.every(1).minutes.do(fill_db2)
 
-while(True):
-    schedule.run_pending()
-    time.sleep(1)
+# while(True):
+#     schedule.run_pending()
+#     time.sleep(1)
+
+fill_db2()
