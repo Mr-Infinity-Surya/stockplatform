@@ -9,6 +9,7 @@ import numpy as np
 import keras
 import tensorflow as tf
 import json
+import pmdarima as pm
 from keras.preprocessing.sequence import TimeseriesGenerator
 
 from keras.models import Sequential
@@ -70,22 +71,17 @@ def redis_pred():
 
         close_data = close_data.reshape((-1))
 
-
         num_prediction = 10
         forecast = predict(num_prediction, model,close_data,look_back)
         forecast_dates = predict_dates(num_prediction,df.index.values[-1])
 
-
-
         new_array = np.array(df.index.to_pydatetime())
-
         new_array = [x.strftime('%y-%m-%d') for x in new_array]
 
         curr_val = close_data[-1]
         diff = curr_val - forecast[0]
         forecast = forecast + diff
 
-        
         trace1 = go.Scatter(
             x=df.index[-150:], y=close_data[-150:],
             mode = 'lines',
@@ -97,11 +93,10 @@ def redis_pred():
             name = 'Prediction'
         )
         layout = go.Layout(
-            title = name + " Predicted Values",
+            title = name + " LSTM Predictions",
             xaxis = {'title' : "Date"},
             yaxis = {'title' : "Close"}
         )
-
         tracefig2 = go.Scatter(
             x=new_array,y= close_data
         )
@@ -123,8 +118,62 @@ def redis_pred():
         x = json.dumps(res)
         r.set(i,x)
         r.save()
+
+        #arima
+        
+        df2 = data.history(start=datetime.datetime.today()-datetime.timedelta(days=12), end=datetime.datetime.today(), interval="1d")[["Open","High","Low","Close","Volume"]]
+        df2.index = pd.to_datetime(df2.index)
+        df2.set_axis(df2.index, inplace=True)
+        df2.drop(columns=['Open', 'High', 'Low', 'Volume'], inplace=True)
+
+        close_data2 = df2['Close'].values
+        close_data2 = close_data2.reshape((-1))
+        new_array2 = np.array(df2.index.to_pydatetime())
+        new_array2 = [x.strftime('%y-%m-%d') for x in new_array2]
+        smodel = pm.auto_arima(df, start_p=1, start_q=1,
+                         test='adf',
+                         max_p=2, max_q=2, m=12,
+                         start_P=0, seasonal=True,
+                         d=None, D=1, trace=True,
+                         error_action='ignore',  
+                         suppress_warnings=True, 
+                         stepwise=True)
+
+        n_periods = 13
+        fitted= smodel.predict(n_periods=n_periods)
+        index_of_fc = pd.date_range(df.index[-1], periods = n_periods, freq='D')
+        fitted[0]=close_data[-1]
+        
+        trace1a = go.Scatter(
+            x=new_array[-150:], y=close_data[-150:],
+            mode = 'lines',
+            name = 'Data'
+        )
+        trace2a = go.Scatter(
+            x=index_of_fc,y= fitted,
+            mode = 'lines',
+            name = 'Prediction'
+        )
+        trace3a = go.Scatter(
+            x=new_array2, y=close_data2,
+            mode = 'lines',
+            name = 'Actual'
+        )
+        layouta = go.Layout(
+            title = name + " ARIMA Predictions",
+            xaxis = {'title' : "Date"},
+            yaxis = {'title' : "Close"}
+        )
+        fig3 = go.Figure(data=[trace1a,trace2a], layout=layouta)
+
+        i3 = name + 'pred_arima'
+        context['fig3'] = fig3.to_html()
+        res.append(context)
+        x3 = json.dumps(res)
+        r.set(i3,x3)
+        r.save()
+
         print("Done" + i)
         #print(json.loads(r.get(i))[0]['fig'])
 
 redis_pred()
-

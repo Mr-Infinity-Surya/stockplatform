@@ -127,6 +127,9 @@ def index(request):
             res = json.loads(r.get(i))   #Retriving data from json          #print(json.loads(r.get(i))[0]['fig'])
             context['G1'] = res[0]['fig2'] #(fig2.to_html())    
             context['G2'] = res[0]['fig']  #(fig.to_html())
+            res2 = json.loads(r.get(name+"pred_arima"))
+
+            context['G3'] = res2[0]['fig3']
             context['Name'] = name
             return render(request,'pred.html',context)
             #return (fig2.to_html(),fig.to_html(),forecast,forecast_dates)
