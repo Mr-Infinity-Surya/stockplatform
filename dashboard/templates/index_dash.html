@@ -22,11 +22,13 @@
     </div>
       <ul class="nav-links">
         {% for x in userinvested%}
+        {% if x.sum_quan > 0%}
         <li>
           <a href="{% url 'databases:apidata'%}?name={{x.Stock_ISIN.Name}}">
             <i class='bx bx-grid-alt' ></i>
             <span class="links_name">{{x.Stock_ISIN.Name}}</span></a>
         </li>
+      {% endif %}
         {% endfor %}
         
         <li>
@@ -72,12 +74,12 @@
             <div class="box-topic">Invested</div>
             <div class="number">{{dashvals.0}}</div>
             <div class="indicator">
-              {% if dashvals.0 > dashvals.4 %}
+              {% if dashvals.0 > dashvals.1 %}
               <i class='bx bx-up-arrow-alt'></i>
-              <span class="text">Better than Yesterday</span>
+              <span class="text">More than Current</span>
               {% else %}
                 <i class='bx bx-down-arrow-alt down'></i>
-                <span class="text">Lesser than Yesterday</span>
+                <span class="text">Lesser than Current</span>
               {% endif%}
             </div>
           </div>
@@ -88,12 +90,12 @@
             <div class="box-topic">Current</div>
             <div class="number">{{dashvals.1}}</div>
               <div class="indicator">
-                {% if dashvals.0 < dashvals.1 %}
+                {% if dashvals.1 > dashvals.4 %}
                 <i class='bx bx-up-arrow-alt'></i>
-                <span class="text">Greater than invested</span>
+                <span class="text">Greater than Yesterday</span>
                 {% else %}
                   <i class='bx bx-down-arrow-alt down'></i>
-                  <span class="text">Lesser than invested</span>
+                  <span class="text">Lesser than Yesterday</span>
                 {% endif%}
               </div>
           </div>

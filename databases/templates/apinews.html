@@ -115,20 +115,30 @@ th, td {
   <ul>
     <h1><strong>{{name}}  {{stock.ISIN}}</h1> </strong>
     {%if invests.usersum != None%}
-    <h2> <br> Invested Sum :  {{invests.usersum}} <br> Total Quantity :{{invests.totalstk}} <br> Current Value :{{invests.stksum}} </h2>  
-    
+    <h2> <br> Current Hold Value :  {{invests.usersum}} <br> Holdings Quantity :{{invests.totalstk}} <br>
+      {% if invests.totalstk > 0 %}
+       Current Value :{{invests.stksum}} 
+       {% endif %} 
+       <br>
+      </h2> 
     <table>
       
       <tr>
         <th>Date of Purchase  </th>
         <th>Quantity  </th>
         <th>Value</th>
+        <th>Transaction</th>
       </tr>
       {%for x in bought%}
       <tr>
         <td>{{x.Date_of_Purchased}}</td>
-        <td>{{x.Quantity}}</td>
+        {% if  x.Quantity|get_digit:"1" %}
+        <td>{{x.Quantity|get_digit:"1"}}</td>
+        {% else %}
+        <td>{{x.Quantity|slice:"1:"}}</td>
+        {% endif %}
         <td> {{x.Purchased_Value}}</td>
+        <td> {{x.Transaction_Mode}} </td>
       </tr>
       {%endfor%}
       

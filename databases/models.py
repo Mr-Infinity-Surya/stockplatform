@@ -28,10 +28,11 @@ class Investor(models.Model):
     city = models.CharField(max_length=1000)
     District = models.CharField(max_length=1000)
     Pin_code = models.IntegerField()
+    #Stocks_Purchased = models.IntegerField(default=0)
 
 class Bank(models.Model):
     Account_no = models.CharField(primary_key=True,max_length=1000,unique=True)
-    Username = models.ForeignKey(Investor,on_delete=models.CASCADE,default='empty')
+    Username = models.ForeignKey(Investor,on_delete=models.CASCADE,default='empty',unique=True)
     IFSC_code = models.CharField(max_length=1000)
     Branch = models.CharField(max_length=1000)
     Current_amount = models.IntegerField(default=0)
@@ -52,3 +53,4 @@ class Investment(models.Model):
     Purchased_Value = models.FloatField()
     User_Account_no = models.ForeignKey(Bank,on_delete=models.CASCADE,default='empty')
     Stock_ISIN = models.ForeignKey(Stock,on_delete=models.CASCADE,default='0')
+    Transaction_Mode= models.CharField(max_length=20,default='Buy')

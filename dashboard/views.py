@@ -12,7 +12,7 @@ def index(request):
         
         bankobj=Bank.objects.get(Username=name)
         accno=bankobj.Account_no
-        invested = Investment.objects.raw("SELECT id,Stock_ISIN_id,SUM(Purchased_Value*Quantity) AS VALUE FROM databases_investment WHERE User_Account_no_id='"+accno+"'" + "GROUP BY Stock_ISIN_id")
+        invested = Investment.objects.raw("SELECT id,Stock_ISIN_id,SUM(Quantity) as sum_quan,SUM(Purchased_Value*Quantity) AS VALUE FROM databases_investment WHERE User_Account_no_id='"+accno+"'" + "GROUP BY Stock_ISIN_id")
         investedtotal = Investment.objects.raw("SELECT id,Stock_ISIN_id FROM databases_investment WHERE User_Account_no_id='"+accno+"'" )
 
         recommned = Stock.objects.raw("Select ISIN,Name from databases_stock ORDER BY ((Current_price-prev_close)*100/Current_price) DESC LIMIT 5")

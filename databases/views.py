@@ -12,7 +12,6 @@ import plotly.graph_objs as go
 from django.contrib.auth.models import User
 import redis
 
- 
 # Create your views here.
 
 import pytz
@@ -162,10 +161,21 @@ def redis_data(request):
            
             
             bought_stk = Investment.objects.raw("SELECT id,SUM(Quantity) as totalstk,SUM(Quantity*Purchased_value) AS usersum,SUM(Quantity*Current_price) as stksum from databases_investment LEFT JOIN databases_stock ON databases_investment.Stock_ISIN_id=databases_stock.ISIN WHERE databases_stock.ISIN='"+str(stockobj.ISIN)+"' AND  User_Account_no_id='"+accno+"'")
+            #added below
+            XY = Investment.objects.raw("SELECT id,SUM(Quantity) as X from databases_investment where User_Account_no_id='"+accno+"' AND Stock_ISIN_id = '"+str(stockobj.ISIN)+"'"+" AND Transaction_Mode = 'Buy'")
+            YZ = Investment.objects.raw("SELECT id,SUM(Quantity) as X from databases_investment where User_Account_no_id='"+accno+"' AND Stock_ISIN_id = '"+str(stockobj.ISIN)+"'"+" AND Transaction_Mode = 'Sell'")
+            for i in XY:
+                print (i.X)
+            for i in YZ:
+                print (i.X)
+            # print(XY.X)  added above
             context['invests'] = {}
             
             for x in bought_stk:
-                context['invests']['totalstk'] = x.totalstk
+                if x.totalstk is not None:
+                    context['invests']['totalstk'] = int(x.totalstk)
+                else : 
+                    context['invests']['totalstk'] = 0
                 context['invests']['usersum'] = x.usersum
                 context['invests']['stksum'] = x.stksum
             context['bought']=bought
@@ -193,6 +203,7 @@ def buyupdate(request):
         stk_name = request.GET['name']#"TATAPOWER.NS" #GET FROM PAGE
         loguser = request.user.username
         bankobj=Bank.objects.get(Username=loguser)
+        #investor = Investor.objects.get(Username = loguser)         #add
         accno=bankobj.Account_no
         stk = Stock.objects.get(Name=stk_name)
         # curr_amount = accno.Current_amount
@@ -213,9 +224,12 @@ def buyupdate(request):
         investobj.Purchased_Value = stk.Current_price
         investobj.User_Account_no = bankobj
         investobj.Stock_ISIN = stk
+        investobj.Transaction = 'Buy'   #add
         investobj.save()
         bankobj.Current_amount -= int(stk.Current_price*int(quantity))
         bankobj.save()
+        #investor.Stocks_Purchased += quantity   #add
+        #investor.save()                         #add
         done = 1
         if(done==0) :
             messages.error(request,"Buy fail")
@@ -245,7 +259,7 @@ def sellupdate(request):
         invested = Investment.objects.raw("SELECT id,Stock_ISIN_id FROM databases_investment WHERE User_Account_no_id='"+accno+"'")
         stk = Stock.objects.get(Name = stk_name)
         bought = Investment.objects.raw("SELECT * from databases_investment WHERE User_Account_no_id='"+accno+"' AND Stock_ISIN_id = '"+str(stk.ISIN)+"'")
-        total = Investment.objects.filter(Stock_ISIN= stk.ISIN).aggregate(Sum('Quantity'))
+        total = Investment.objects.filter(Stock_ISIN= stk.ISIN,User_Account_no=accno).aggregate(Sum('Quantity'))
         total = total['Quantity__sum']
 
         print(total)
@@ -257,6 +271,20 @@ def sellupdate(request):
             messages.error(request,"Error !! Not enough quantity in your holdings")
             return redirect('/db/apidata'+'?name='+request.GET['name'])
             #return HttpResponse('<h1> Not enough quantity in your holdings <a href = \'/dashboard\'> go back </a></h1>')
+        
+        stkcurr = stk.Current_price
+        x = Investment()
+        x.Quantity = -quantity
+        x.Date_of_Purchased = datetime.today()
+        x.Purchased_Value = stkcurr
+        x.User_Account_no = bankobj
+        x.Stock_ISIN = stk
+        x.Transaction_Mode = 'Sell'   #add
+        x.save()
+        bankobj.Current_amount += stkcurr * abs(x.Quantity)
+        bankobj.save()
+        ###
+        '''
         total = quantity
         stkcurr = stk.Current_price
         for x in bought : 
@@ -273,7 +301,8 @@ def sellupdate(request):
                 else : x.save()
             bankobj.save()
                 
-            
+        '''
+        ### 
 
         if(bought is None) :
             messages.error(request,"Error !! you have not purchased stock")
