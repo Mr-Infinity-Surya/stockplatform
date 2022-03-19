@@ -13,4 +13,4 @@ urlpatterns = [
     path('reset/login',views.user_login,name='resetlogin'),
     path('register_investor',views.investor_reg,name='investor_registration'),
     path('register_bank',views.bank_reg,name='register_bank'),
-]
+] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
