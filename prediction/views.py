@@ -135,6 +135,6 @@ def index(request):
             #return (fig2.to_html(),fig.to_html(),forecast,forecast_dates)
             #return (fig2,fig,forecast,forecast_dates)
         else:
-            return HttpResponse("<h1> ERROR in page <a href='dashboard:index'> Go back </a> </h1>")
+            return HttpResponse("<h1> ERROR in page <a href=\'/dashboard\'> Go back </a> </h1>")
     else:
-        return HttpResponse("<h1> ERROR in page <a href='dashboard:index'> Go back </a> </h1>")
+        return HttpResponse("<h1> ERROR in page <a href=\'/dashboard\'> Go back </a> </h1>")
