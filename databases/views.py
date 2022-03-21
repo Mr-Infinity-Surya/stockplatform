@@ -93,7 +93,7 @@ def fill_db2(request):
             st.Open =  float(stk_res['open'])
             st.Revenue_growth =  float(stk_res['revenueGrowth'])
 
-            st.clean()
+            st.clean_fields()
             st.save()
             
             co.Name = str(cmp_res['longName'])
@@ -105,7 +105,7 @@ def fill_db2(request):
             co.Gross_Profit = float(cmp_res['grossProfits'])
 
             print(st,co)
-            co.clean()
+            co.clean_fields()
             co.save()
         x = Stock.objects.all()
         return HttpResponse("ok<br>{{x}}")
