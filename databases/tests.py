@@ -29,7 +29,7 @@ class Stock_and_CompanyTestCase(TestCase):
             li.append(i + '.NS')
         li = ['AXISBANK.NS','BHARTIARTL.NS','CIPLA.NS','HCLTECH.NS','ICICIBANK.NS','ITC.NS','KOTAKBANK.NS','JSWSTEEL.NS','MARUTI.NS','POWERGRID.NS','SBIN.NS','TATAMOTORS.NS','TATASTEEL.NS','TCS.NS','WIPRO.NS','EICHERMOT.NS','GRASIM.NS', 'HINDUNILVR.NS', 'LT.NS', 'NESTLEIND.NS', 'NTPC.NS','SUNPHARMA.NS', 'TECHM.NS']
         for stocks in li:
-            try:
+            #try:
                 stk_res,cmp_res = get_stock_data(stocks)
                 st = Stock()
                 co = Company()
@@ -56,8 +56,8 @@ class Stock_and_CompanyTestCase(TestCase):
                 co.Gross_Profit = float(cmp_res['grossProfits'])
                 co.clean()
                 co.save()
-            except (TypeError):
-                continue
+            #except (TypeError):
+            #    continue
         
     def test_ISIN(self):
         stks = Stock.objects.all()
@@ -70,7 +70,7 @@ class Investor_and_BankTestCase(TestCase):
     def setUpTestData(self):
         for i in range(100):
             inv = Investor()
-            un = ''.join(random.choices(string.ascii_lowercase + string.ascii_uppercase + string.digits,k=1000000))
+            un = ''.join(random.choices(string.ascii_lowercase + string.ascii_uppercase + string.digits,k=1000))
             pa = ''.join(random.choices(string.ascii_lowercase + string.ascii_uppercase + string.digits,k=random.randrange(4,100)))
             fn = ''.join(random.choices(string.ascii_lowercase + string.ascii_uppercase + string.digits,k=random.randrange(4,100)))
             ln = ''.join(random.choices(string.ascii_lowercase + string.ascii_uppercase + string.digits,k=random.randrange(4,100)))
