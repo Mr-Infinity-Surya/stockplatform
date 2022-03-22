@@ -110,7 +110,7 @@ def user_reset(request):
                 user.set_password(x)
                 user.save()
                 send_mail('New Password Reset',f'Hi {user.first_name} Your new password is {x} and is successfully reseted. Note that this will be your password unless resetted again. If you want to change the password to your convenience, contact this email.',from_email=None,recipient_list=[email])
-                messages.success(request,"Succesfully Sent, check mail (if its in spam otherwise) n <a href='reset/login'> login </a></h1>")
+                messages.success(request,"Succesfully Sent, check mail (if its in spam otherwise) n login")
                 #return HttpResponse("<h1> Done, check mail (if its in spam otherwise) n <a href='reset/login'> login </a></h1>")
             else:
                 messages.error(request,"Error User not Found")
